@@ -10,7 +10,7 @@ import { useGLTF } from '@react-three/drei';
 const cubeTextureLoader = new CubeTextureLoader();
 const textureLoader = new TextureLoader();
 
-const getSkyboxTextureArray = () => {
+export const getSkyboxTextureArray = () => {
   const textureArray = cubeTextureLoader.load([
     require('../resource/skybox/corona_ft.png'),
     require('../resource/skybox/corona_bk.png'),
@@ -25,7 +25,7 @@ const getSkyboxTextureArray = () => {
   return textureArray;
 };
 
-const getGroundTexture = () => {
+export const getGroundTexture = () => {
   const texture = textureLoader.load(require('../resource/dirt.jpg'));
   texture.wrapS = RepeatWrapping;
   texture.wrapT = RepeatWrapping;
@@ -33,12 +33,13 @@ const getGroundTexture = () => {
   return texture;
 };
 
-const Model = (props) => {
+export const RemiliaModel = (props) => {
   const { nodes, materials } = useGLTF('/model/Remilia/Scene.gltf');
   return (
-    <group {...props} dispose={null}>
-      <group rotation={[-Math.PI / 2, 0, 0]}>
+    <group dispose={null}>
+      <group>
         <mesh
+          {...props}
           geometry={nodes.Object_2.geometry}
           material={materials.Material_0}
         />
@@ -48,5 +49,3 @@ const Model = (props) => {
 };
 
 useGLTF.preload('/model/Remilia/Scene.gltf');
-
-export { getSkyboxTextureArray, getGroundTexture, Model };
