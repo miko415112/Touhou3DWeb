@@ -33,4 +33,20 @@ const getGroundTexture = () => {
   return texture;
 };
 
-export { getSkyboxTextureArray, getGroundTexture };
+const Model = (props) => {
+  const { nodes, materials } = useGLTF('/model/Remilia/Scene.gltf');
+  return (
+    <group {...props} dispose={null}>
+      <group rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh
+          geometry={nodes.Object_2.geometry}
+          material={materials.Material_0}
+        />
+      </group>
+    </group>
+  );
+};
+
+useGLTF.preload('/model/Remilia/Scene.gltf');
+
+export { getSkyboxTextureArray, getGroundTexture, Model };
