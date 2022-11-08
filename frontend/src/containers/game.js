@@ -1,9 +1,8 @@
-import { useRef, useFrame, Suspense } from 'react';
-import { Canvas, useThree, useLoader } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { Skybox, Ground } from '../components/environment';
-import { Player } from '../components/player';
-import { Control } from '../components/control';
+import { LocalPlayer } from './player';
 import { Physics } from '@react-three/cannon';
+import { Synchronizer } from './synchronizer';
 
 function GameScene() {
   return (
@@ -11,7 +10,8 @@ function GameScene() {
       <Skybox />
       <Ground />
       <Physics>
-        <Control />
+        <LocalPlayer modelName='Remilia' />
+        <Synchronizer />
       </Physics>
     </Canvas>
   );
