@@ -1,19 +1,9 @@
 import { Character } from '../components/character';
-import { subscribePlayerChange, unSubscribePlayerChange } from './network';
-import { useEffect, useState } from 'react';
+import { useNetwork } from './hooks/network';
 import { Euler, Vector3 } from 'three';
 
 export const Synchronizer = () => {
-  const [playerList, setPlayerList] = useState([]);
-
-  const playerChangeListener = (playerList) => {
-    setPlayerList(playerList);
-  };
-
-  useEffect(() => {
-    subscribePlayerChange(playerChangeListener);
-    return unSubscribePlayerChange(playerChangeListener);
-  }, []);
+  const { playerList } = useNetwork([]);
 
   return (
     <>

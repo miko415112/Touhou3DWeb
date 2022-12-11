@@ -1,11 +1,12 @@
 import { Character } from '../components/character';
 import { useControl } from './hooks/control';
 import { useThree } from '@react-three/fiber';
-import { updatePlayer } from './network';
+import { useNetwork } from './hooks/network';
 import { useEffect, useRef } from 'react';
 
 export const LocalPlayer = (modelName) => {
   const { rigidState } = useControl();
+  const { updatePlayer } = useNetwork();
   const { camera } = useThree();
   const preUpdateTime = useRef(0);
   const curTime = useRef(0);

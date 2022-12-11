@@ -4,7 +4,7 @@ const rooms = new Set();
 export const registerHandler = (io) => {
   handleConnection(io);
   //handleDisconnection(io);
-  handlePlayerChange(io);
+  handlePlayerStateChange(io);
 };
 
 const handleConnection = (io) => {
@@ -26,17 +26,17 @@ const handleDisconnection = (io) => {
   });
 };
 
-const handlePlayerChange = (io) => {
+const handlePlayerStateChange = (io) => {
   setInterval(() => {
-    io.emit('playerChange', playerList);
+    io.emit('playerStateChange', playerList);
   }, 30);
 };
 
 const initailize = (socket) => {
-  socket.on('updatePlayer', OnUpdatePlayer);
+  socket.on('playerStateChange', OnPlayerStateChange);
 };
 
-const OnUpdatePlayer = (data) => {
+const OnPlayerStateChange = (data) => {
   const index = playerList.findIndex((e) => e.name === data.name);
   if (index !== -1) {
     playerList[index] = data;
