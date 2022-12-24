@@ -4,7 +4,7 @@ import { LocalPlayer } from './player';
 import { Physics } from '@react-three/cannon';
 import { Synchronizer } from './synchronizer';
 
-function GameScene() {
+export function GamePage() {
   return (
     <Canvas>
       <Skybox />
@@ -16,5 +16,3 @@ function GameScene() {
     </Canvas>
   );
 }
-
-export { GameScene };
