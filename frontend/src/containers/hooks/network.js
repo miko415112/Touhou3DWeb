@@ -4,8 +4,24 @@ import { Manager } from 'socket.io-client';
 const manager = new Manager('http://localhost:4000');
 const socket = manager.socket('/');
 
+const createRoom = (name) => {
+  const data = {
+    name,
+  };
+  socket.emit('Create_Room', data);
+};
+
+const joinRoom = (name, roomID) => {
+  const data = {
+    name,
+    roomID,
+  };
+  socket.emit('Join_Room', data);
+};
+
 export const useNetwork = () => {
   const [playerList, setPlayerList] = useState([]);
+  const [message, setMessage] = useState({});
 
   const updatePlayer = (name, rigidState) => {
     const data = {
@@ -22,7 +38,10 @@ export const useNetwork = () => {
     socket.on('playerStateChange', (newPlayerList) =>
       setPlayerList(newPlayerList)
     );
+    socket.on('Message', (msg) => {
+      setMessage(msg);
+    });
   }, []);
 
-  return { playerList, updatePlayer };
+  return { playerList, updatePlayer, createRoom, joinRoom, message };
 };

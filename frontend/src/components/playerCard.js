@@ -4,6 +4,8 @@ import {
   LoadingOutlined,
   CheckCircleOutlined,
   SyncOutlined,
+  RightSquareTwoTone,
+  LeftSquareTwoTone,
 } from '@ant-design/icons';
 import { Tag } from 'antd';
 import nameBorderImage from '../resource/nameBorder.png';
@@ -42,13 +44,27 @@ const BoxWrapper = styled.div`
     padding: 5px;
     font-size: 15pt;
   }
+
+  position: relative;
+  .right_arrow {
+    position: absolute;
+    top: 50%;
+    left: 120%;
+    transform: translate(-50%, -50%);
+  }
+  .left_arrow {
+    position: absolute;
+    top: 50%;
+    left: -20%;
+    transform: translate(-50%, -50%);
+  }
 `;
 
 const NameWrapper = styled.div`
   -webkit-border-image: url(${nameBorderImage}) 30 30 round;
   -moz-border-image: url(${nameBorderImage}) 30 30 round;
   -o-border-image: url(${nameBorderImage}) 30 30 round;
-  background-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.6);
   width: 100%;
   height: 20%;
 
@@ -56,14 +72,15 @@ const NameWrapper = styled.div`
   justify-content: center;
   align-items: center;
   .name {
-    font-size: 18pt;
+    font-size: 15pt;
   }
 `;
 
 export const PlayerCard = forwardRef((props, ref) => {
+  const { name, state, show_arrow, left, right } = props;
   let color = '';
   let icon = null;
-  switch (props.state) {
+  switch (state) {
     case 'choosing':
       color = 'processing';
       icon = <SyncOutlined spin />;
@@ -81,13 +98,25 @@ export const PlayerCard = forwardRef((props, ref) => {
   return (
     <PlayerWrapper>
       <NameWrapper>
-        <div className='name'>{props.name}</div>
+        <div className='name'>{name}</div>
       </NameWrapper>
       <BoxWrapper>
-        <div ref={ref} class='chara'></div>
+        <div ref={ref} className='chara'></div>
         <Tag color={color} icon={icon}>
-          {props.state}
+          {state}
         </Tag>
+        {show_arrow ? (
+          <>
+            <LeftSquareTwoTone
+              className='left_arrow'
+              style={{ fontSize: left ? '60px' : '40px' }}
+            />
+            <RightSquareTwoTone
+              className='right_arrow'
+              style={{ fontSize: right ? '60px' : '40px' }}
+            />
+          </>
+        ) : null}
       </BoxWrapper>
     </PlayerWrapper>
   );

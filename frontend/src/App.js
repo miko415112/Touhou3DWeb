@@ -1,9 +1,12 @@
 import './App.css';
 import { React } from 'react';
-import { createBrowserRouter, RouterProvider, Route } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
 import { GamePage } from './containers/gamePage';
 import { HomePage } from './containers/homePage';
 import { RoomPage } from './containers/roomPage';
+
+import { UserProvider } from './containers/hooks/context';
 
 const router = createBrowserRouter([
   {
@@ -15,7 +18,7 @@ const router = createBrowserRouter([
     element: <GamePage />,
   },
   {
-    path: '/room/:roomID/:id/:name',
+    path: '/room',
     element: <RoomPage />,
   },
 ]);
@@ -23,7 +26,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <div className='root'>
-      <RouterProvider router={router} />
+      <UserProvider>
+        <RouterProvider router={router}></RouterProvider>
+      </UserProvider>
     </div>
   );
 }

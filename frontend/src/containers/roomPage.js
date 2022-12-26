@@ -10,10 +10,14 @@ import roomBackgroundImage from '../resource/roomBackground.jpg';
 import { PlayerCard } from '../components/playerCard';
 import { useKeyboard } from './hooks/input';
 import { useNavigate } from 'react-router-dom';
+import { OptionPanel } from '../components/optionPanel';
+import { useUser } from './hooks/context';
 
 const keymap = {
   ArrowUp: 'up',
   ArrowDown: 'down',
+  ArrowRight: 'right',
+  ArrowLeft: 'left',
   KeyZ: 'select',
 };
 
@@ -24,6 +28,11 @@ const RoomPageWrapper = styled.div`
   height: 675px;
   position: relative;
 
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
   .canvas {
     position: fixed !important;
     top: -30px;
@@ -31,8 +40,19 @@ const RoomPageWrapper = styled.div`
   }
 `;
 
+const OptionSectionWrapper = styled.div`
+  width: 25%;
+  height: 60%;
+  display: flex;
+`;
+
+const PlayerSectionWrapper = styled.div`
+  width: 75%;
+  height: 100%;
+`;
+
 const SectionWrapper = styled.div`
-  width: 80%;
+  width: 100%;
   height: 50%;
   display: flex;
   justify-content: space-around;
@@ -66,8 +86,10 @@ const RotationCharacter = ({ spin }) => {
 export const RoomPage = () => {
   const { roomID, id, name } = useParams();
   const [selection, setSelection] = useState(1);
+  const { state, setState } = useUser();
   const navigate = useNavigate();
-  const optionNumber = 3;
+  const optionNumber = 4;
+  const textOptions = ['Start', 'Quit', 'Kick'];
   const movement = useKeyboard(keymap);
 
   const canvasRef = useRef();
@@ -77,11 +99,17 @@ export const RoomPage = () => {
   const player3Ref = useRef();
 
   useEffect(() => {
+    if (state === 'game') navigate('/game', { replace: true });
+    else if (state === 'room') navigate('/room', { replace: true });
+    else if (state === 'home') navigate('/', { replace: true });
+  }, [state]);
+
+  useEffect(() => {
     let newSelection = selection;
     if (movement.up) newSelection = selection - 1;
     if (movement.down) newSelection = selection + 1;
-    if (newSelection > optionNumber) newSelection = newSelection % optionNumber;
-    if (newSelection <= 0) newSelection = newSelection + optionNumber;
+    if (newSelection >= optionNumber) newSelection = 0;
+    if (newSelection <= -1) newSelection = newSelection + optionNumber;
     setSelection(newSelection);
     if (movement.select) {
       switch (selection) {
@@ -96,14 +124,16 @@ export const RoomPage = () => {
   return (
     <>
       <RoomPageWrapper ref={canvasRef}>
-        <SectionWrapper>
-          <PlayerCard ref={localPlayerRef} name={'miko'} state={'ready'} />
-        </SectionWrapper>
-        <SectionWrapper>
-          <PlayerCard ref={player1Ref} name={'miko'} state={'waiting'} />
-          <PlayerCard ref={player2Ref} name={'miko'} state={'choosing'} />
-          <PlayerCard ref={player3Ref} name={'miko'} state={'choosing'} />
-        </SectionWrapper>
+        <PlayerSectionWrapper>
+          <SectionWrapper>
+            <PlayerCard ref={localPlayerRef} name={'miko'} state={'ready'} />
+          </SectionWrapper>
+          <SectionWrapper>
+            <PlayerCard ref={player1Ref} name={'miko'} state={'waiting'} />
+            <PlayerCard ref={player2Ref} name={'miko'} state={'choosing'} />
+            <PlayerCard ref={player3Ref} name={'miko'} state={'choosing'} />
+          </SectionWrapper>
+        </PlayerSectionWrapper>
         <Canvas eventSource={canvasRef} className='canvas'>
           <View track={localPlayerRef}>
             <RotationCharacter spin={true} />
@@ -118,6 +148,9 @@ export const RoomPage = () => {
             <RotationCharacter spin={true} />
           </View>
         </Canvas>
+        <OptionSectionWrapper>
+          <OptionPanel options={textOptions} selection={selection} />
+        </OptionSectionWrapper>
       </RoomPageWrapper>
     </>
   );

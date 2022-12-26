@@ -4,7 +4,9 @@ import backgroundImage from '../resource/background.png';
 import { useKeyboard } from './hooks/input';
 import { JoinRoomModal, CreateRoomModal } from '../components/modal';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+import { OptionPanel } from '../components/optionPanel';
+import { useNetwork } from './hooks/network';
+import { useUser } from './hooks/context';
 
 const keymap = {
   ArrowUp: 'up',
@@ -21,100 +23,70 @@ const HomePageWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
-`;
 
-const OptionPanelWrapper = styled.div`
-  width: 50%;
-  height: 50%;
-  position: relative;
-  [id='1'] {
-    position: absolute;
-    top: 0%;
-    left: 40%;
-  }
-  [id='2'] {
-    position: absolute;
-    top: 20%;
-    left: 32%;
-  }
-  [id='3'] {
-    position: absolute;
-    top: 40%;
-    left: 24%;
-  }
-  [id='4'] {
-    position: absolute;
-    top: 60%;
-    left: 16%;
+  .optionPanel {
+    width: 50%;
+    height: 50%;
   }
 `;
-
-const TouhouFont = styled.div`
-  * {
-    font-family: DFPOPコン W12;
-    font-size: ${(props) => (props.hilight ? '3.4vw' : '3vw')};
-    font-weight: bold;
-    -webkit-text-stroke: 1px Black;
-    background-image: ${(props) =>
-      props.hilight
-        ? 'linear-gradient(to bottom,white 30% ,red)'
-        : 'linear-gradient(to bottom,white 30%,white)'};
-    color: transparent;
-    background-clip: text;
-    -webkit-background-clip: text;
-    opacity: ${(props) => (props.hilight ? 1 : 0.5)};
-  }
-`;
-
-const OptionBlock = (props) => {
-  return (
-    <>
-      <TouhouFont hilight={props.selection == props.id}>
-        <div id={props.id}>{props.content}</div>
-      </TouhouFont>
-    </>
-  );
-};
 
 export const HomePage = () => {
-  const [selection, setSelection] = useState(1);
+  const { createRoom, joinRoom, message } = useNetwork();
+  const { state, setState, displayStatus, setPlayerID, setRoomID } = useUser();
+  const movement = useKeyboard(keymap);
+
+  const [selection, setSelection] = useState(0);
   const [joinRoomModalOpen, SetJoinRoomModalOpen] = useState(false);
   const [createRoomModalOpen, SetCreateRoomModalOpen] = useState(false);
   const navigate = useNavigate();
-  const movement = useKeyboard(keymap);
   const optionNumber = 4;
+  const options = ['Create Game', 'Join Game', 'Create Game', 'Join Game'];
+
+  useEffect(() => {
+    if (state === 'game') navigate('/game', { replace: true });
+    else if (state === 'room') navigate('/room', { replace: true });
+    else if (state === 'home') navigate('/', { replace: true });
+  }, [state]);
 
   useEffect(() => {
     let newSelection = selection;
     if (movement.up) newSelection = selection - 1;
     if (movement.down) newSelection = selection + 1;
-    if (newSelection > optionNumber) newSelection = newSelection % optionNumber;
-    if (newSelection <= 0) newSelection = newSelection + optionNumber;
+    if (newSelection >= optionNumber) newSelection = 0;
+    if (newSelection <= -1) newSelection = newSelection + optionNumber;
     setSelection(newSelection);
     if (movement.select) {
       switch (selection) {
-        case 1:
+        case 0:
           SetCreateRoomModalOpen(true);
           break;
-        case 2:
+        case 1:
           SetJoinRoomModalOpen(true);
           break;
       }
     }
   }, [movement]);
 
+  useEffect(() => {
+    displayStatus(message);
+    if (message.type === 'success') {
+      setPlayerID(message.playerID);
+      setRoomID(message.roomID);
+      setState('room');
+    }
+  }, [message]);
+
   const OnCreateRoom = (values) => {
-    const roomID = uuidv4();
-    const id = uuidv4();
     const name = values.name;
-    navigate(`/room/${roomID}/${id}/${name}`);
+    createRoom(name);
+    SetCreateRoomModalOpen(false);
   };
 
   const OnJoinRoom = (values) => {
-    const id = uuidv4();
     const name = values.name;
     const roomID = values.roomID;
-    navigate(`/room/${roomID}/${id}/${name}`);
+    joinRoom(name, roomID);
+    SetJoinRoomModalOpen(false);
   };
 
   return (
@@ -130,12 +102,7 @@ export const HomePage = () => {
         onCreate={OnCreateRoom}
       />
       <HomePageWrapper>
-        <OptionPanelWrapper>
-          <OptionBlock content='Create Game' id={'1'} selection={selection} />
-          <OptionBlock content='Join Game' id={'2'} selection={selection} />
-          <OptionBlock content='Create Game' id={'3'} selection={selection} />
-          <OptionBlock content='Join Game' id={'4'} selection={selection} />
-        </OptionPanelWrapper>
+        <OptionPanel options={options} selection={selection} />
       </HomePageWrapper>
     </>
   );
