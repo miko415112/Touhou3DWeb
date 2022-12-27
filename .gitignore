@@ -37,4 +37,4 @@ sketch
 # End of https://www.toptal.com/developers/gitignore/api/yarn,react
 
 #modelDir
-./frontend/public/model/
+frontend/public/model/
