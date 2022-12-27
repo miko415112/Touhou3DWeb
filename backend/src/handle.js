@@ -14,8 +14,9 @@ const handleConnection = (io) => {
     handleDisconnection(socket);
     handleCreateRoom(socket);
     handleJoinRoom(socket);
+    handleStartGame(socket);
     handleLeaveRoom(socket);
-
+    handlePlayerStateChange(socket);
     connections++;
     console.log(`user ${socket.id} connected`);
   });
@@ -29,7 +30,10 @@ const handleCreateRoom = (socket) => {
     playerList.set(playerID, {
       name: name,
       modelName: 'Remilia',
+      state: 'choosing',
+      isLeader: true,
     });
+
     rooms.set(roomID, { playerList: playerList, state: 'choosing' });
 
     socket.join(roomID);
@@ -67,6 +71,9 @@ const handleJoinRoom = (socket) => {
     }
     room.playerList.set(playerID, {
       name: name,
+      modelName: 'Remilia',
+      state: 'choosing',
+      isLeader: false,
     });
 
     socket.join(roomID);
@@ -82,12 +89,45 @@ const handleJoinRoom = (socket) => {
   });
 };
 
+const handleStartGame = (socket) => {
+  socket.on('Start_Game', ({ roomID }) => {
+    const room = rooms.get(roomID);
+    let allReady = true;
+    room.playerList.forEach((player, playerID) => {
+      if (player.state !== 'ready') allReady = false;
+    });
+
+    if (allReady) {
+      room.state = 'playing';
+      socket.emit('Message', {
+        type: 'success',
+        msg: 'started room successfully',
+      });
+    } else {
+      socket.emit('Message', {
+        type: 'error',
+        msg: 'someone is not ready',
+      });
+    }
+    console.log(`room ${roomID} started`);
+  });
+};
+
 const handleDisconnection = (socket) => {
   socket.on('disconnect', () => {
     const playerID = socket.id;
     rooms.forEach((value, key) => {
-      if (value.playerList.has(playerID)) value.playerList.delete(playerID);
-      if (value.playerList.size === 0) rooms.delete(key);
+      if (value.playerList.has(playerID)) {
+        const isLeader = value.playerList.get(playerID).isLeader;
+        value.playerList.delete(playerID);
+        if (value.playerList.size !== 0 && isLeader) {
+          const [firstKey] = value.playerList.keys();
+          value.playerList.set(firstKey, {
+            ...value.playerList.get(firstKey),
+            isLeader: true,
+          });
+        } else if (value.playerList.size === 0) rooms.delete(key);
+      }
     });
     connections--;
     console.log(`user ${playerID} disconnected`);
@@ -97,20 +137,48 @@ const handleDisconnection = (socket) => {
 const handleLeaveRoom = (socket) => {
   socket.on('Leave_Room', ({ playerID, roomID }) => {
     const room = rooms.get(roomID);
+    if (!room) return;
+    const isLeader = room.playerList.get(playerID).isLeader;
     room.playerList.delete(playerID);
-    if (room.playerList.size === 0) rooms.delete(roomID);
+    if (room.playerList.size !== 0 && isLeader) {
+      const [firstKey] = room.playerList.keys();
+      room.playerList.set(firstKey, {
+        ...room.playerList.get(firstKey),
+        isLeader: true,
+      });
+    } else if (room.playerList.size === 0) rooms.delete(roomID);
     socket.leave(roomID);
     console.log(`user ${playerID} has left room ${roomID}`);
   });
 };
 
+const handlePlayerStateChange = (socket) => {
+  socket.on('Player_State_Change', ({ roomID, playerID, props }) => {
+    const room = rooms.get(roomID);
+    if (!room) return;
+    const prev = room.playerList.get(playerID);
+    room.playerList.set(playerID, {
+      ...prev,
+      ...props,
+    });
+    console.log(`user ${playerID} state changed`);
+  });
+};
+
 const handleBroadcast = (io) => {
   setInterval(() => {
-    rooms.forEach((value, key) => {
-      const payload = value;
-      io.to(key).emit(payload);
+    rooms.forEach((room, roomID) => {
+      const playerList = Array.from(room.playerList, ([name, value]) => ({
+        playerID: name,
+        ...value,
+      }));
+      const payload = {
+        ...room,
+        playerList,
+      };
+      io.to(roomID).emit('Room_Info', payload);
     });
-  }, 60);
+  }, 80);
   console.log('start broadcasting');
 };
 

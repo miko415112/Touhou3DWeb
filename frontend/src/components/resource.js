@@ -48,9 +48,30 @@ export const RemiliaModel = (props) => {
   );
 };
 
+export const YuumuModel = (props) => {
+  const { nodes, materials } = useGLTF('/model/Yuumu/Scene.gltf');
+  return (
+    <group
+      position={[0, -3, 0]}
+      rotation={[-Math.PI, 0, 0]}
+      scale={0.6}
+      dispose={null}
+    >
+      <group>
+        <mesh
+          {...props}
+          geometry={nodes.Object_2.geometry}
+          material={materials.Youmu_low_Material_u1_v1}
+        />
+      </group>
+    </group>
+  );
+};
+
 export const roomBackgroundImage = require('../resource/roomBackground.jpg');
 export const homeBackgroundImage = require('../resource/background.png');
 export const nameBorderImage = require('../resource/nameBorder.png');
 export const charaBorderImage = require('../resource/charaBorder.png');
 
 useGLTF.preload('/model/Remilia/Scene.gltf');
+useGLTF.preload('/model/Yuumu/Scene.gltf');

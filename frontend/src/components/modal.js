@@ -18,15 +18,10 @@ export const JoinRoomModal = ({ open, onJoin, onCancel }) => {
       cancelText='Cancel'
       onCancel={onCancel}
       onOk={() => {
-        form
-          .validateFields()
-          .then((values) => {
-            form.resetFields();
-            onJoin(values);
-          })
-          .catch((e) => {
-            window.alert(e);
-          });
+        form.validateFields().then((values) => {
+          form.resetFields();
+          onJoin(values);
+        });
       }}
     >
       <Form form={form} layout='vertical' name='form_in_modal'>
@@ -69,15 +64,10 @@ export const CreateRoomModal = ({ open, onCreate, onCancel }) => {
       cancelText='Cancel'
       onCancel={onCancel}
       onOk={() => {
-        form
-          .validateFields()
-          .then((values) => {
-            form.resetFields();
-            onCreate(values);
-          })
-          .catch((e) => {
-            window.alert(e);
-          });
+        form.validateFields().then((values) => {
+          form.resetFields();
+          onCreate(values);
+        });
       }}
     >
       <Form form={form} layout='vertical' name='form_in_modal'>

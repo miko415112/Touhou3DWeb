@@ -34,7 +34,7 @@ const HomePageWrapper = styled.div`
 
 const HomePage = () => {
   const { createRoom, joinRoom, message } = useNetwork();
-  const { state, setState, setPlayerID, setRoomID, setName } = useUser();
+  const { location, setLocation, setPlayerID, setRoomID, setName } = useUser();
   const movement = useKeyboard(keymap);
   const [selection, setSelection] = useState(0);
   const [joinRoomModalOpen, SetJoinRoomModalOpen] = useState(false);
@@ -44,10 +44,10 @@ const HomePage = () => {
   const options = ['Create Game', 'Join Game', 'Create Game', 'Join Game'];
 
   useEffect(() => {
-    if (state === 'game') navigate('/game', { replace: true });
-    else if (state === 'room') navigate('/room', { replace: true });
-    else if (state === 'home') navigate('/', { replace: true });
-  }, [state]);
+    if (location === 'game') navigate('/game', { replace: true });
+    else if (location === 'room') navigate('/room', { replace: true });
+    else if (location === 'home') navigate('/', { replace: true });
+  }, [location]);
 
   useEffect(() => {
     let newSelection = selection;
@@ -74,7 +74,7 @@ const HomePage = () => {
       setPlayerID(message.playerID);
       setRoomID(message.roomID);
       setName(message.name);
-      setState('room');
+      setLocation('room');
     }
   }, [message]);
 

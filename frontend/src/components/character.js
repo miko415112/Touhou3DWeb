@@ -1,11 +1,15 @@
-import { RemiliaModel } from './resource';
+import { RemiliaModel, YuumuModel } from './resource';
 import { useState, useEffect } from 'react';
 import { Euler, Quaternion, Vector3 } from 'three';
 
+export const characterList = ['Remilia', 'Yuumu'];
+
 export const Character = (props) => {
-  switch (props.name) {
+  switch (props.modelName) {
     case 'Remilia':
       return <RemiliaModel {...props} />;
+    case 'Yuumu':
+      return <YuumuModel {...props} />;
   }
   return <RemiliaModel {...props} />;
 };
@@ -29,7 +33,7 @@ export const RotationCharacter = ({ modelName, spin, scale }) => {
     return () => {
       clearInterval(id);
     };
-  }, [rotation]);
+  }, [spin]);
 
   return <Character modelName={modelName} rotation={rotation} scale={scale} />;
 };

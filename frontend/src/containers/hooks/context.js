@@ -3,12 +3,12 @@ const UserContext = createContext({
   name: '',
   roomID: '',
   playerID: '',
-  state: '',
+  location: '',
   modelName: '',
   setName: () => {},
   setRoomID: () => {},
   setPlayerID: () => {},
-  setState: () => {},
+  setLocation: () => {},
   setModelName: () => {},
 });
 
@@ -19,7 +19,7 @@ export const UserProvider = (props) => {
   const [roomID, setRoomID] = useState('');
   const [playerID, setPlayerID] = useState('');
   const [modelName, setModelName] = useState('Remilia');
-  const [state, setState] = useState('home');
+  const [location, setLocation] = useState('home');
 
   return (
     <UserContext.Provider
@@ -27,12 +27,12 @@ export const UserProvider = (props) => {
         name,
         roomID,
         playerID,
-        state,
+        location,
         modelName,
         setName,
         setRoomID,
         setPlayerID,
-        setState,
+        setLocation,
         setModelName,
       }}
       {...props}

@@ -6,6 +6,7 @@ import {
   SyncOutlined,
   RightSquareTwoTone,
   LeftSquareTwoTone,
+  AimOutlined,
 } from '@ant-design/icons';
 import { Tag } from 'antd';
 import { nameBorderImage, charaBorderImage } from './resource';
@@ -76,7 +77,7 @@ const NameWrapper = styled.div`
 `;
 
 export const PlayerCard = forwardRef((props, ref) => {
-  const { name, state, show_arrow, left, right } = props;
+  const { name, state, showArrow, isLeader } = props;
   let color = '';
   let icon = null;
   switch (state) {
@@ -97,6 +98,9 @@ export const PlayerCard = forwardRef((props, ref) => {
   return (
     <PlayerWrapper>
       <NameWrapper>
+        {isLeader ? (
+          <AimOutlined style={{ color: 'Yellow', fontSize: '25px' }} />
+        ) : null}
         <div className='name'>{name}</div>
       </NameWrapper>
       <BoxWrapper>
@@ -104,15 +108,15 @@ export const PlayerCard = forwardRef((props, ref) => {
         <Tag color={color} icon={icon}>
           {state}
         </Tag>
-        {show_arrow ? (
+        {showArrow == true ? (
           <>
             <LeftSquareTwoTone
               className='left_arrow'
-              style={{ fontSize: left ? '60px' : '40px' }}
+              style={{ fontSize: '40px' }}
             />
             <RightSquareTwoTone
               className='right_arrow'
-              style={{ fontSize: right ? '60px' : '40px' }}
+              style={{ fontSize: '40px' }}
             />
           </>
         ) : null}
