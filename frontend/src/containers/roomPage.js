@@ -1,17 +1,17 @@
-import { useState, useEffect, useRef, forwardRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Character } from '../components/character';
-import { Euler, Quaternion, Vector3 } from 'three';
+import { useNavigate } from 'react-router-dom';
 import { View } from '@react-three/drei';
 import styled from 'styled-components';
 
-import roomBackgroundImage from '../resource/roomBackground.jpg';
+import { roomBackgroundImage } from '../components/resource';
+import { RotationCharacter } from '../components/character';
 import { PlayerCard } from '../components/playerCard';
 import { useKeyboard } from './hooks/input';
-import { useNavigate } from 'react-router-dom';
 import { OptionPanel } from '../components/optionPanel';
 import { useUser } from './hooks/context';
+import { displayRoomID } from '../components/info';
+import { useNetwork } from './hooks/network';
 
 const keymap = {
   ArrowUp: 'up',
@@ -60,36 +60,13 @@ const SectionWrapper = styled.div`
   gap: 20px;
 `;
 
-const RotationCharacter = ({ spin }) => {
-  const [rotation, setRotation] = useState(new Euler(0, 0, 0));
-
-  useEffect(() => {
-    if (!spin) return;
-    const id = setInterval(() => {
-      setRotation((prev) => {
-        const pre_q = new Quaternion().setFromEuler(prev);
-        const delta_q = new Quaternion().setFromAxisAngle(
-          new Vector3(0, 1, 0),
-          0.1
-        );
-        const new_q = pre_q.multiply(delta_q);
-        return new Euler().setFromQuaternion(new_q);
-      });
-    }, 60);
-    return () => {
-      clearInterval(id);
-    };
-  }, [rotation]);
-  return <Character modelName={'Remilia'} rotation={rotation} scale={0.23} />;
-};
-
-export const RoomPage = () => {
-  const { roomID, id, name } = useParams();
-  const [selection, setSelection] = useState(1);
-  const { state, setState } = useUser();
+const RoomPage = () => {
+  const [selection, setSelection] = useState(0);
+  const { state, setState, roomID, playerID } = useUser();
+  const { leaveRoom } = useNetwork();
   const navigate = useNavigate();
   const optionNumber = 4;
-  const textOptions = ['Start', 'Quit', 'Kick'];
+  const textOptions = ['Start', 'Quit', 'RoomID'];
   const movement = useKeyboard(keymap);
 
   const canvasRef = useRef();
@@ -113,9 +90,14 @@ export const RoomPage = () => {
     setSelection(newSelection);
     if (movement.select) {
       switch (selection) {
+        case 0:
+          break;
         case 1:
+          leaveRoom(playerID);
+          setState('home');
           break;
         case 2:
+          displayRoomID(roomID);
           break;
       }
     }
@@ -136,16 +118,16 @@ export const RoomPage = () => {
         </PlayerSectionWrapper>
         <Canvas eventSource={canvasRef} className='canvas'>
           <View track={localPlayerRef}>
-            <RotationCharacter spin={true} />
+            <RotationCharacter spin={true} modelName={'Remilia'} scale={0.23} />
           </View>
           <View track={player1Ref}>
-            <RotationCharacter spin={true} />
+            <RotationCharacter spin={true} modelName={'Remilia'} scale={0.23} />
           </View>
           <View track={player2Ref}>
-            <RotationCharacter spin={true} />
+            <RotationCharacter spin={true} modelName={'Remilia'} scale={0.23} />
           </View>
           <View track={player3Ref}>
-            <RotationCharacter spin={true} />
+            <RotationCharacter spin={true} modelName={'Remilia'} scale={0.23} />
           </View>
         </Canvas>
         <OptionSectionWrapper>
@@ -155,3 +137,5 @@ export const RoomPage = () => {
     </>
   );
 };
+
+export default RoomPage;

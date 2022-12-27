@@ -1,25 +1,36 @@
 import './App.css';
-import { React } from 'react';
+import { React, Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
-import { GamePage } from './containers/gamePage';
-import { HomePage } from './containers/homePage';
-import { RoomPage } from './containers/roomPage';
-
 import { UserProvider } from './containers/hooks/context';
+
+const GamePage = lazy(() => import('./containers/gamePage'));
+const HomePage = lazy(() => import('./containers/homePage'));
+const RoomPage = lazy(() => import('./containers/roomPage'));
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage />,
+    element: (
+      <Suspense fallback={<p>loading...</p>}>
+        <HomePage />
+      </Suspense>
+    ),
   },
   {
     path: '/game',
-    element: <GamePage />,
+    element: (
+      <Suspense fallback={<p>loading...</p>}>
+        <GamePage />
+      </Suspense>
+    ),
   },
   {
     path: '/room',
-    element: <RoomPage />,
+    element: (
+      <Suspense fallback={<p>loading...</p>}>
+        <RoomPage />
+      </Suspense>
+    ),
   },
 ]);
 

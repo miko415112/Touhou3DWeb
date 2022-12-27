@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import backgroundImage from '../resource/background.png';
+
+import { homeBackgroundImage } from '../components/resource';
 import { useKeyboard } from './hooks/input';
 import { JoinRoomModal, CreateRoomModal } from '../components/modal';
-import { useNavigate } from 'react-router-dom';
 import { OptionPanel } from '../components/optionPanel';
 import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
+import { displayStatus } from '../components/info';
 
 const keymap = {
   ArrowUp: 'up',
@@ -15,7 +17,7 @@ const keymap = {
 };
 
 const HomePageWrapper = styled.div`
-  background-image: url(${backgroundImage});
+  background-image: url(${homeBackgroundImage});
   background-repeat: no-repeat;
   width: 1200px;
   height: 675px;
@@ -30,11 +32,10 @@ const HomePageWrapper = styled.div`
   }
 `;
 
-export const HomePage = () => {
+const HomePage = () => {
   const { createRoom, joinRoom, message } = useNetwork();
-  const { state, setState, displayStatus, setPlayerID, setRoomID } = useUser();
+  const { state, setState, setPlayerID, setRoomID, setName } = useUser();
   const movement = useKeyboard(keymap);
-
   const [selection, setSelection] = useState(0);
   const [joinRoomModalOpen, SetJoinRoomModalOpen] = useState(false);
   const [createRoomModalOpen, SetCreateRoomModalOpen] = useState(false);
@@ -72,6 +73,7 @@ export const HomePage = () => {
     if (message.type === 'success') {
       setPlayerID(message.playerID);
       setRoomID(message.roomID);
+      setName(message.name);
       setState('room');
     }
   }, [message]);
@@ -107,3 +109,5 @@ export const HomePage = () => {
     </>
   );
 };
+
+export default HomePage;

@@ -48,4 +48,9 @@ export const RemiliaModel = (props) => {
   );
 };
 
+export const roomBackgroundImage = require('../resource/roomBackground.jpg');
+export const homeBackgroundImage = require('../resource/background.png');
+export const nameBorderImage = require('../resource/nameBorder.png');
+export const charaBorderImage = require('../resource/charaBorder.png');
+
 useGLTF.preload('/model/Remilia/Scene.gltf');

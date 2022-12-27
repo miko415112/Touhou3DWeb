@@ -4,7 +4,7 @@ import { LocalPlayer } from './player';
 import { Physics } from '@react-three/cannon';
 import { Synchronizer } from './synchronizer';
 
-export function GamePage() {
+const GamePage = () => {
   return (
     <Canvas>
       <Skybox />
@@ -15,4 +15,6 @@ export function GamePage() {
       </Physics>
     </Canvas>
   );
-}
+};
+
+export default GamePage;

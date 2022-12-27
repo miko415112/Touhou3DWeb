@@ -19,6 +19,13 @@ const joinRoom = (name, roomID) => {
   socket.emit('Join_Room', data);
 };
 
+const leaveRoom = (playerID) => {
+  const data = {
+    playerID: playerID,
+  };
+  socket.emit('Leave_Room', data);
+};
+
 export const useNetwork = () => {
   const [playerList, setPlayerList] = useState([]);
   const [message, setMessage] = useState({});
@@ -43,5 +50,12 @@ export const useNetwork = () => {
     });
   }, []);
 
-  return { playerList, updatePlayer, createRoom, joinRoom, message };
+  return {
+    playerList,
+    updatePlayer,
+    createRoom,
+    joinRoom,
+    message,
+    leaveRoom,
+  };
 };

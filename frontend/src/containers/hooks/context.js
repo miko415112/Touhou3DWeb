@@ -1,41 +1,24 @@
 import { useState, useContext, createContext, useEffect } from 'react';
-import { message } from 'antd';
 const UserContext = createContext({
   name: '',
   roomID: '',
   playerID: '',
-  state: 'home',
+  state: '',
+  modelName: '',
   setName: () => {},
   setRoomID: () => {},
   setPlayerID: () => {},
   setState: () => {},
-  displayStatus: () => {},
+  setModelName: () => {},
 });
 
 export const useUser = () => useContext(UserContext);
 
-const displayStatus = (s) => {
-  if (s.msg) {
-    const { type, msg } = s;
-    const content = {
-      content: msg,
-      duration: s.duration ? s.duration : 2,
-    };
-    switch (type) {
-      case 'success':
-        message.success(content);
-        break;
-      case 'error':
-      default:
-        message.error(content);
-        break;
-    }
-  }
-};
 export const UserProvider = (props) => {
   const [name, setName] = useState('');
   const [roomID, setRoomID] = useState('');
   const [playerID, setPlayerID] = useState('');
+  const [modelName, setModelName] = useState('Remilia');
   const [state, setState] = useState('home');
 
   return (
@@ -45,11 +28,12 @@ export const UserProvider = (props) => {
         roomID,
         playerID,
         state,
+        modelName,
         setName,
         setRoomID,
         setPlayerID,
         setState,
-        displayStatus,
+        setModelName,
       }}
       {...props}
     />

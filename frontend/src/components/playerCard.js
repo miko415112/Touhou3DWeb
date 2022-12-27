@@ -8,8 +8,7 @@ import {
   LeftSquareTwoTone,
 } from '@ant-design/icons';
 import { Tag } from 'antd';
-import nameBorderImage from '../resource/nameBorder.png';
-import charaBorderImage from '../resource/charaBorder.png';
+import { nameBorderImage, charaBorderImage } from './resource';
 
 const PlayerWrapper = styled.div`
   width: 200px;
