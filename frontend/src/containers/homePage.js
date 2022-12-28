@@ -14,7 +14,7 @@ import { OptionPanel } from '../components/optionPanel';
 import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
 import { displayStatus } from '../components/info';
-
+import { Profile } from '../components/profile';
 const keymap = {
   ArrowUp: 'up',
   ArrowDown: 'down',
@@ -30,10 +30,17 @@ const HomePageWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
+  position: relative;
 
   .optionPanel {
     width: 50%;
     height: 50%;
+  }
+
+  .profile {
+    position: absolute;
+    top: 20px;
+    left: 20px;
   }
 `;
 
@@ -42,8 +49,9 @@ const HomePage = () => {
   const {
     location,
     signIn,
+    google,
     setSignIn,
-    setEmail,
+    setGoogle,
     setLocation,
     setPlayerID,
     setRoomID,
@@ -108,7 +116,7 @@ const HomePage = () => {
   const OnSignIn = (response) => {
     console.log(response.credential);
     const user = jwt_decode(response.credential);
-    setEmail(user.email);
+    setGoogle(user);
     setSignIn(true);
     console.log(user);
   };
@@ -127,6 +135,7 @@ const HomePage = () => {
       />
       <SignInModal open={signIn !== true} callback={OnSignIn} />
       <HomePageWrapper>
+        {signIn ? <Profile src={google?.picture} name={google?.name} /> : null}
         <OptionPanel options={options} selection={selection} />
       </HomePageWrapper>
     </>

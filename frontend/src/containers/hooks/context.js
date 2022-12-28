@@ -1,14 +1,14 @@
 import { useState, useContext, createContext, useEffect } from 'react';
 const UserContext = createContext({
   signIn: false,
-  email: '',
+  google: '',
   name: '',
   roomID: '',
   playerID: '',
   location: '',
   modelName: '',
   setSignIn: () => {},
-  setEmail: () => {},
+  setGoogle: () => {},
   setName: () => {},
   setRoomID: () => {},
   setPlayerID: () => {},
@@ -20,7 +20,7 @@ export const useUser = () => useContext(UserContext);
 
 export const UserProvider = (props) => {
   const [signIn, setSignIn] = useState(false);
-  const [email, setEmail] = useState('');
+  const [google, setGoogle] = useState('');
   const [name, setName] = useState('');
   const [roomID, setRoomID] = useState('');
   const [playerID, setPlayerID] = useState('');
@@ -31,14 +31,14 @@ export const UserProvider = (props) => {
     <UserContext.Provider
       value={{
         signIn,
-        email,
+        google,
         name,
         roomID,
         playerID,
         location,
         modelName,
         setSignIn,
-        setEmail,
+        setGoogle,
         setName,
         setRoomID,
         setPlayerID,
