@@ -1,5 +1,6 @@
 import { Modal, Form, Input } from 'antd';
 import styled from 'styled-components';
+import { GoogleLogin } from '@react-oauth/google';
 
 const TouhouFont = styled.div`
   font-family: Alfa Slab One;
@@ -7,6 +8,29 @@ const TouhouFont = styled.div`
   color: Black;
   font-weight: bold;
 `;
+
+const GoogleWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+export const SignInModal = ({ open, callback }) => {
+  return (
+    <Modal
+      open={open}
+      title='You need to sign in first'
+      footer={null}
+      closable={false}
+    >
+      <GoogleWrapper>
+        <GoogleLogin
+          onSuccess={callback}
+          onError={() => console.log('login failed')}
+        />
+      </GoogleWrapper>
+    </Modal>
+  );
+};
 
 export const JoinRoomModal = ({ open, onJoin, onCancel }) => {
   const [form] = Form.useForm();

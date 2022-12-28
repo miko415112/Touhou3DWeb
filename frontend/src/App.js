@@ -2,6 +2,7 @@ import './App.css';
 import { React, Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { UserProvider } from './containers/hooks/context';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const GamePage = lazy(() => import('./containers/gamePage'));
 const HomePage = lazy(() => import('./containers/homePage'));
@@ -38,7 +39,9 @@ function App() {
   return (
     <div className='root'>
       <UserProvider>
-        <RouterProvider router={router}></RouterProvider>
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>
+          <RouterProvider router={router}></RouterProvider>
+        </GoogleOAuthProvider>
       </UserProvider>
     </div>
   );

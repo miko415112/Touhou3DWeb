@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import jwt_decode from 'jwt-decode';
 
 import { homeBackgroundImage } from '../components/resource';
 import { useKeyboard } from './hooks/input';
-import { JoinRoomModal, CreateRoomModal } from '../components/modal';
+import {
+  JoinRoomModal,
+  CreateRoomModal,
+  SignInModal,
+} from '../components/modal';
 import { OptionPanel } from '../components/optionPanel';
 import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
@@ -34,14 +39,23 @@ const HomePageWrapper = styled.div`
 
 const HomePage = () => {
   const { createRoom, joinRoom, message } = useNetwork();
-  const { location, setLocation, setPlayerID, setRoomID, setName } = useUser();
+  const {
+    location,
+    signIn,
+    setSignIn,
+    setEmail,
+    setLocation,
+    setPlayerID,
+    setRoomID,
+    setName,
+  } = useUser();
   const movement = useKeyboard(keymap);
   const [selection, setSelection] = useState(0);
   const [joinRoomModalOpen, SetJoinRoomModalOpen] = useState(false);
   const [createRoomModalOpen, SetCreateRoomModalOpen] = useState(false);
   const navigate = useNavigate();
   const optionNumber = 4;
-  const options = ['Create Game', 'Join Game', 'Create Game', 'Join Game'];
+  const options = ['Create Game', 'Join Game', 'Change Name', 'Log Out'];
 
   useEffect(() => {
     if (location === 'game') navigate('/game', { replace: true });
@@ -91,6 +105,14 @@ const HomePage = () => {
     SetJoinRoomModalOpen(false);
   };
 
+  const OnSignIn = (response) => {
+    console.log(response.credential);
+    const user = jwt_decode(response.credential);
+    setEmail(user.email);
+    setSignIn(true);
+    console.log(user);
+  };
+
   return (
     <>
       <JoinRoomModal
@@ -103,6 +125,7 @@ const HomePage = () => {
         onCancel={() => SetCreateRoomModalOpen(false)}
         onCreate={OnCreateRoom}
       />
+      <SignInModal open={signIn !== true} callback={OnSignIn} />
       <HomePageWrapper>
         <OptionPanel options={options} selection={selection} />
       </HomePageWrapper>
