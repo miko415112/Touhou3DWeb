@@ -1,5 +1,5 @@
 import uuid4 from 'uuid4';
-
+import { UserModel } from './mongo/model';
 const rooms = new Map();
 let connections = 0;
 
