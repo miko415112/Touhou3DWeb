@@ -9,6 +9,7 @@ import {
   JoinRoomModal,
   ChangeNameModal,
   SignInModal,
+  FriendsModal,
 } from '../components/modal';
 import { OptionPanel } from '../components/optionPanel';
 import { useNetwork } from './hooks/network';
@@ -34,7 +35,7 @@ const HomePageWrapper = styled.div`
 
   .optionPanel {
     width: 50%;
-    height: 50%;
+    height: 60%;
   }
 
   .profile {
@@ -45,27 +46,53 @@ const HomePageWrapper = styled.div`
 `;
 
 const HomePage = () => {
-  const { signInGame, changeName, createRoom, joinRoom, message } =
-    useNetwork();
+  //use option panel
+  const movement = useKeyboard(keymap);
+  const [selection, setSelection] = useState(0);
+  const optionNumber = 5;
+  const options = [
+    'Create Game',
+    'Join Game',
+    'Change Name',
+    'Friends',
+    'Log Out',
+  ];
+  //manage modalsa
+  const [joinRoomModalOpen, setJoinRoomModalOpen] = useState(false);
+  const [changeNameModalOpen, setChangeNameModalOpen] = useState(false);
+  const [friendsModalOpen, setFriendsModalOpen] = useState(false);
+  //switch pages
+  const navigate = useNavigate();
+  //useNetwork
+  const {
+    signInGame,
+    changeName,
+    addFriend,
+    acceptFriend,
+    deleteFriend,
+    deleteRequest,
+    createRoom,
+    joinRoom,
+    message,
+  } = useNetwork();
+  //save data
   const {
     location,
     signIn,
     name,
     google,
+    requests,
+    friends,
     setSignIn,
     setGoogle,
+    setRequests,
+    setFriends,
     setLocation,
     setPlayerID,
     setRoomID,
     setName,
   } = useUser();
-  const movement = useKeyboard(keymap);
-  const [selection, setSelection] = useState(0);
-  const [joinRoomModalOpen, setJoinRoomModalOpen] = useState(false);
-  const [changeNameModalOpen, setChangeNameModalOpen] = useState(false);
-  const navigate = useNavigate();
-  const optionNumber = 4;
-  const options = ['Create Game', 'Join Game', 'Change Name', 'Log Out'];
+
   useEffect(() => {
     if (location === 'game') navigate('/game', { replace: true });
     else if (location === 'room') navigate('/room', { replace: true });
@@ -91,6 +118,9 @@ const HomePage = () => {
           setChangeNameModalOpen(true);
           break;
         case 3:
+          setFriendsModalOpen(true);
+          break;
+        case 4:
           OnLogOut();
           break;
       }
@@ -102,10 +132,25 @@ const HomePage = () => {
     if (message.type === 'success') {
       switch (message.event) {
         case 'SignIn':
+          setSignIn(true);
           setName(message.name);
+          setRequests(message.requests);
+          setFriends(message.friends);
           break;
         case 'Change_Name':
           setName(message.name);
+          break;
+        case 'Add_Friend':
+          break;
+        case 'Accept_Friend':
+          setRequests(message.requests);
+          setFriends(message.friends);
+          break;
+        case 'Delete_Friend':
+          setFriends(message.friends);
+          break;
+        case 'Delete_Request':
+          setRequests(message.requests);
           break;
         case 'Create_Room':
           setPlayerID(message.playerID);
@@ -121,6 +166,33 @@ const HomePage = () => {
     }
   }, [message]);
 
+  const OnSignIn = (response) => {
+    const user = jwt_decode(response.credential);
+    setGoogle(user);
+    signInGame(user.email, user.name, user.picture);
+  };
+
+  const OnAddFriend = (values) => {
+    const email_to = values.email;
+    const email_from = google.email;
+    addFriend(email_from, email_to);
+  };
+
+  const OnAcceptFriend = (email_from) => {
+    const email_to = google.email;
+    acceptFriend(email_from, email_to);
+  };
+
+  const OnDeleteFriend = (email_to) => {
+    const email_from = google.email;
+    deleteFriend(email_from, email_to);
+  };
+
+  const OnDeleteRequest = (email_to) => {
+    const email_from = google.email;
+    deleteRequest(email_from, email_to);
+  };
+
   const OnCreateRoom = () => {
     createRoom(google.email, name);
   };
@@ -131,15 +203,8 @@ const HomePage = () => {
     setJoinRoomModalOpen(false);
   };
 
-  const OnSignIn = (response) => {
-    const user = jwt_decode(response.credential);
-    setGoogle(user);
-    signInGame(user.email, user.name);
-    setSignIn(true);
-  };
-
   const OnSaveName = (values) => {
-    changeName(google.email, values.name);
+    changeName(google.email, values.name, google.picture);
     setChangeNameModalOpen(false);
   };
 
@@ -162,6 +227,16 @@ const HomePage = () => {
         onJoin={OnJoinRoom}
       />
       <SignInModal open={signIn !== true} callback={OnSignIn} />
+      <FriendsModal
+        open={friendsModalOpen}
+        onCancel={() => setFriendsModalOpen(false)}
+        onAddFriend={OnAddFriend}
+        onAcceptFriend={OnAcceptFriend}
+        onDeleteFriend={OnDeleteFriend}
+        onDeleteRequest={OnDeleteRequest}
+        requests={requests}
+        friends={friends}
+      ></FriendsModal>
       <HomePageWrapper>
         {signIn ? <Profile src={google?.picture} name={name} /> : null}
         <OptionPanel options={options} selection={selection} />

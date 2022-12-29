@@ -24,6 +24,11 @@ const OptionBlockWrapper = styled.div`
     top: 60%;
     left: 16%;
   }
+  [id='4'] {
+    position: absolute;
+    top: 80%;
+    left: 8%;
+  }
 `;
 
 const TouhouFont = styled.div`

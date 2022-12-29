@@ -4,20 +4,54 @@ import { Manager } from 'socket.io-client';
 const manager = new Manager('http://localhost:4000');
 const socket = manager.socket('/');
 
-const signInGame = (email, name) => {
+const signInGame = (email, name, picture) => {
   const data = {
     email,
     name,
+    picture,
   };
   socket.emit('SignIn', data);
 };
 
-const changeName = (email, name) => {
+const changeName = (email, name, picture) => {
   const data = {
     email,
     name,
+    picture,
   };
   socket.emit('Change_Name', data);
+};
+
+const addFriend = (email_from, email_to) => {
+  const data = {
+    email_from,
+    email_to,
+  };
+  socket.emit('Add_Friend', data);
+};
+
+const acceptFriend = (email_from, email_to) => {
+  const data = {
+    email_from,
+    email_to,
+  };
+  socket.emit('Accept_Friend', data);
+};
+
+const deleteFriend = (email_from, email_to) => {
+  const data = {
+    email_from,
+    email_to,
+  };
+  socket.emit('Delete_Friend', data);
+};
+
+const deleteRequest = (email_from, email_to) => {
+  const data = {
+    email_from,
+    email_to,
+  };
+  socket.emit('Delete_Request', data);
 };
 
 const createRoom = (email, name) => {
@@ -86,6 +120,10 @@ export const useNetwork = () => {
     updatePlayer,
     signInGame,
     changeName,
+    addFriend,
+    acceptFriend,
+    deleteFriend,
+    deleteRequest,
     createRoom,
     joinRoom,
     leaveRoom,

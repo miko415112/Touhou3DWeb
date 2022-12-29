@@ -16,6 +16,10 @@ const handleConnection = (io) => {
     handleChangeName(socket);
     handleCreateRoom(socket);
     handleJoinRoom(socket);
+    handleAddFriend(socket);
+    handleAcceptFriend(socket);
+    handleDeleteFriend(socket);
+    handleDeleteRequest(socket);
     handleStartGame(socket);
     handleLeaveRoom(socket);
     handlePlayerStateChange(socket);
@@ -25,15 +29,25 @@ const handleConnection = (io) => {
 };
 
 const handleSignIn = (socket) => {
-  socket.on('SignIn', async ({ email, name }) => {
+  socket.on('SignIn', async ({ email, name, picture }) => {
     let user = await UserModel.findOne({ email: email });
-    if (!user) user = await new UserModel({ email: email, name: name }).save();
+
+    if (!user)
+      user = await new UserModel({
+        email: email,
+        name: name,
+        picture: picture,
+      }).save();
+
+    await user.populate('requests friends');
 
     socket.emit('Message', {
       event: 'SignIn',
       type: 'success',
       msg: 'signed in successfully',
       name: user.name,
+      requests: user.requests,
+      friends: user.friends,
     });
 
     console.log(`user ${email} signIn`);
@@ -41,9 +55,14 @@ const handleSignIn = (socket) => {
 };
 
 const handleChangeName = (socket) => {
-  socket.on('Change_Name', async ({ email, name }) => {
+  socket.on('Change_Name', async ({ email, name, picture }) => {
     let user = await UserModel.findOne({ email: email });
-    if (!user) await new UserModel({ email: email, name: name }).save();
+    if (!user)
+      await new UserModel({
+        email: email,
+        name: name,
+        picture: picture,
+      }).save();
     else await UserModel.updateOne({ email: email }, { $set: { name: name } });
 
     socket.emit('Message', {
@@ -54,6 +73,138 @@ const handleChangeName = (socket) => {
     });
 
     console.log(`user update name :${name}`);
+  });
+};
+
+const handleAddFriend = (socket) => {
+  socket.on('Add_Friend', async ({ email_from, email_to }) => {
+    let user_from = await UserModel.findOne({ email: email_from });
+    let user_to = await UserModel.findOne({ email: email_to });
+    if (!user_from || !user_to) {
+      socket.emit('Message', {
+        type: 'error',
+        msg: 'user not found',
+      });
+      return;
+    }
+
+    await UserModel.updateOne(
+      { email: email_to },
+      { $push: { requests: user_from._id } }
+    );
+
+    socket.emit('Message', {
+      event: 'Add_Friend',
+      type: 'success',
+      msg: 'sent request successfully',
+    });
+
+    console.log(`user ${email_from} sent friend request to ${email_to}`);
+  });
+};
+
+const handleAcceptFriend = (socket) => {
+  socket.on('Accept_Friend', async ({ email_from, email_to }) => {
+    let user_from = await UserModel.findOne({ email: email_from });
+    let user_to = await UserModel.findOne({ email: email_to });
+    if (!user_from || !user_to) {
+      socket.emit('Message', {
+        type: 'error',
+        msg: 'user not found',
+      });
+      return;
+    }
+
+    await UserModel.updateOne(
+      { email: email_to },
+      { $pull: { requests: user_from._id }, $push: { friends: user_from._id } }
+    );
+
+    await UserModel.updateOne(
+      { email: email_from },
+      { $pull: { requests: user_to._id }, $push: { friends: user_to._id } }
+    );
+
+    let new_user_to = await UserModel.findOne({ email: email_to });
+    await new_user_to.populate('requests');
+    await new_user_to.populate('friends');
+
+    socket.emit('Message', {
+      event: 'Accept_Friend',
+      type: 'success',
+      msg: 'Accepted request successfully',
+      requests: new_user_to.requests,
+      friends: new_user_to.friends,
+    });
+
+    console.log(`user ${email_to} accepted friend request from ${email_from}`);
+  });
+};
+
+const handleDeleteFriend = (socket) => {
+  socket.on('Delete_Friend', async ({ email_from, email_to }) => {
+    let user_from = await UserModel.findOne({ email: email_from });
+    let user_to = await UserModel.findOne({ email: email_to });
+    if (!user_from || !user_to) {
+      socket.emit('Message', {
+        type: 'error',
+        msg: 'user not found',
+      });
+      return;
+    }
+
+    await UserModel.updateOne(
+      { email: email_to },
+      { $pull: { friends: user_from._id } }
+    );
+
+    await UserModel.updateOne(
+      { email: email_from },
+      { $pull: { friends: user_to._id } }
+    );
+
+    let new_user_from = await UserModel.findOne({ email: email_from });
+    await new_user_from.populate('friends');
+
+    socket.emit('Message', {
+      event: 'Delete_Friend',
+      type: 'success',
+      msg: 'Deleted friend successfully',
+      friends: new_user_from.friends,
+    });
+
+    console.log(`user ${email_from} deleted friend from ${email_to}`);
+  });
+};
+
+const handleDeleteRequest = (socket) => {
+  socket.on('Delete_Request', async ({ email_from, email_to }) => {
+    let user_from = await UserModel.findOne({ email: email_from });
+    let user_to = await UserModel.findOne({ email: email_to });
+    if (!user_from || !user_to) {
+      socket.emit('Message', {
+        type: 'error',
+        msg: 'user not found',
+      });
+      return;
+    }
+
+    await UserModel.updateOne(
+      { email: email_from },
+      { $pull: { requests: user_to._id } }
+    );
+
+    let new_user_from = await UserModel.findOne({ email: email_from });
+    await new_user_from.populate('requests');
+
+    socket.emit('Message', {
+      event: 'Delete_Request',
+      type: 'success',
+      msg: 'Deleted request successfully',
+      requests: new_user_from.requests,
+    });
+
+    console.log(`user ${email_from} deleted request from ${email_to}`);
   });
 };
 
