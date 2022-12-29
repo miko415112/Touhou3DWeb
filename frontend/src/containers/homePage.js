@@ -57,7 +57,7 @@ const HomePage = () => {
     'Friends',
     'Log Out',
   ];
-  //manage modalsa
+  //manage modals
   const [joinRoomModalOpen, setJoinRoomModalOpen] = useState(false);
   const [changeNameModalOpen, setChangeNameModalOpen] = useState(false);
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
@@ -67,6 +67,7 @@ const HomePage = () => {
   const {
     signInGame,
     changeName,
+    openFriendSystem,
     addFriend,
     acceptFriend,
     deleteFriend,
@@ -118,6 +119,7 @@ const HomePage = () => {
           setChangeNameModalOpen(true);
           break;
         case 3:
+          openFriendSystem(google.email);
           setFriendsModalOpen(true);
           break;
         case 4:
@@ -139,6 +141,10 @@ const HomePage = () => {
           break;
         case 'Change_Name':
           setName(message.name);
+          break;
+        case 'Open_FriendSystem':
+          setRequests(message.requests);
+          setFriends(message.friends);
           break;
         case 'Add_Friend':
           break;

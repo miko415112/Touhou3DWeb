@@ -16,6 +16,7 @@ const handleConnection = (io) => {
     handleChangeName(socket);
     handleCreateRoom(socket);
     handleJoinRoom(socket);
+    handleOpenFriendSystem(socket);
     handleAddFriend(socket);
     handleAcceptFriend(socket);
     handleDeleteFriend(socket);
@@ -73,6 +74,32 @@ const handleChangeName = (socket) => {
     });
 
     console.log(`user update name :${name}`);
+  });
+};
+
+const handleOpenFriendSystem = (socket) => {
+  socket.on('Open_FriendSystem', async ({ email }) => {
+    let user = await UserModel.findOne({ email: email });
+    if (!user) {
+      socket.emit('Message', {
+        type: 'error',
+        msg: 'data not found',
+      });
+      return;
+    }
+
+    await user.populate('requests');
+    await user.populate('friends');
+
+    socket.emit('Message', {
+      event: 'Open_FriendSystem',
+      type: 'success',
+      msg: 'fetched data successfully',
+      requests: user.requests,
+      friends: user.friends,
+    });
+
+    console.log(`user ${email} fetched data `);
   });
 };
 
