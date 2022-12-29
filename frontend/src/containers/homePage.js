@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import jwt_decode from 'jwt-decode';
 
+import { displayInvitation } from '../components/info';
 import { homeBackgroundImage } from '../components/resource';
 import { useKeyboard } from './hooks/input';
 import {
@@ -76,6 +77,7 @@ const HomePage = () => {
     joinRoom,
     message,
   } = useNetwork();
+
   //save data
   const {
     location,
@@ -84,6 +86,7 @@ const HomePage = () => {
     google,
     requests,
     friends,
+    roomID,
     setSignIn,
     setGoogle,
     setRequests,
@@ -167,6 +170,13 @@ const HomePage = () => {
           setPlayerID(message.playerID);
           setRoomID(message.roomID);
           setLocation('room');
+          break;
+        case 'Invite_Friend':
+          if (message.roomID !== undefined) {
+            displayInvitation(message.user, () => {
+              OnJoinRoom({ roomID: message.roomID });
+            });
+          }
           break;
       }
     }

@@ -5,6 +5,7 @@ import {
   UserAddOutlined,
   CheckOutlined,
   CloseOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 
 const TouhouFont = styled.div`
@@ -25,8 +26,8 @@ const FriendsWrapper = styled.div`
   justify-content: flex-start;
 
   gap: 10px;
-  overflow: auto;
   height: 200px;
+  overflow: auto;
 `;
 
 const RequestsWrapper = styled.div`
@@ -148,7 +149,6 @@ export const FriendsModal = ({
   onDeleteRequest,
 }) => {
   const [form] = Form.useForm();
-  console.log(requests);
   return (
     <Modal open={open} footer={null} onCancel={onCancel}>
       <TouhouFont>friends request</TouhouFont>
@@ -184,7 +184,7 @@ export const FriendsModal = ({
             <RowWrapper key={idx}>
               <img src={friend.picture} />
               <div>{friend.name}</div>
-
+              <div>{friend.email}</div>
               <Button
                 onClick={() => {
                   onDeleteFriend(friend.email);
@@ -225,6 +225,57 @@ export const FriendsModal = ({
           />
         </Form.Item>
       </Form>
+    </Modal>
+  );
+};
+
+export const InviteModal = ({
+  open,
+  friends,
+  onlineFriends,
+  onInvite,
+  onCancel,
+}) => {
+  const offlineFriends = friends.filter(
+    (friend) =>
+      !onlineFriends.some((onlineFriend) => onlineFriend.email === friend.email)
+  );
+
+  return (
+    <Modal open={open} footer={null} onCancel={onCancel}>
+      <TouhouFont>Online Friends</TouhouFont>
+
+      <FriendsWrapper>
+        {onlineFriends?.map((friend, idx) => {
+          return (
+            <RowWrapper key={idx}>
+              <img src={friend.picture} />
+              <div>{friend.name}</div>
+              <div>{friend.email}</div>
+              <Button
+                onClick={() => {
+                  onInvite(friend.email);
+                }}
+                size='small'
+                icon={<PlusOutlined />}
+              />
+            </RowWrapper>
+          );
+        })}
+      </FriendsWrapper>
+
+      <TouhouFont>Offline Friends</TouhouFont>
+      <RequestsWrapper>
+        {offlineFriends?.map((friend, idx) => {
+          return (
+            <RowWrapper key={idx}>
+              <img src={friend.picture} />
+              <div>{friend.name}</div>
+              <div>{friend.email}</div>
+            </RowWrapper>
+          );
+        })}
+      </RequestsWrapper>
     </Modal>
   );
 };

@@ -1,6 +1,7 @@
 import uuid4 from 'uuid4';
 import { UserModel } from './mongo/model';
 const rooms = new Map();
+const onlinePlayers = new Map();
 let connections = 0;
 
 export const registerHandler = (io) => {
@@ -17,6 +18,7 @@ const handleConnection = (io) => {
     handleCreateRoom(socket);
     handleJoinRoom(socket);
     handleOpenFriendSystem(socket);
+    handleInviteFriend(io, socket);
     handleAddFriend(socket);
     handleAcceptFriend(socket);
     handleDeleteFriend(socket);
@@ -46,6 +48,14 @@ const handleSignIn = (socket) => {
       event: 'SignIn',
       type: 'success',
       msg: 'signed in successfully',
+      name: user.name,
+      requests: user.requests,
+      friends: user.friends,
+    });
+
+    onlinePlayers.set(socket.id, {
+      email: email,
+      picture: picture,
       name: user.name,
       requests: user.requests,
       friends: user.friends,
@@ -91,12 +101,26 @@ const handleOpenFriendSystem = (socket) => {
     await user.populate('requests');
     await user.populate('friends');
 
+    const old_data = onlinePlayers.get(socket.id);
+    onlinePlayers.set(socket.id, {
+      ...old_data,
+      requests: user.requests,
+      friends: user.friends,
+    });
+
+    const onlineFriends = [];
+    onlinePlayers.forEach((player, playerID) => {
+      if (user.friends.some((friend) => friend.email === player.email))
+        onlineFriends.push(player);
+    });
+
     socket.emit('Message', {
       event: 'Open_FriendSystem',
       type: 'success',
       msg: 'fetched data successfully',
       requests: user.requests,
       friends: user.friends,
+      onlineFriends: onlineFriends,
     });
 
     console.log(`user ${email} fetched data `);
@@ -201,6 +225,36 @@ const handleDeleteFriend = (socket) => {
     });
 
     console.log(`user ${email_from} deleted friend from ${email_to}`);
+  });
+};
+
+const handleInviteFriend = (io, socket) => {
+  socket.on('Invite_Friend', async ({ playerID, email_to, roomID }) => {
+    let target_id = '';
+    onlinePlayers.forEach((player, playerID) => {
+      if (player.email === email_to) target_id = playerID;
+    });
+    if (target_id === '') return;
+    let target_socket;
+    const sockets = await io.fetchSockets();
+    const index = sockets.findIndex((s) => s.id === target_id);
+    if (index === -1) return;
+
+    target_socket = sockets[index];
+
+    socket.emit('Message', {
+      event: 'Invite_Friend',
+      type: 'success',
+      msg: 'invited friend successfully',
+    });
+
+    target_socket.emit('Message', {
+      event: 'Invite_Friend',
+      type: 'success',
+      msg: 'received invitation successfully',
+      user: onlinePlayers.get(playerID),
+      roomID: roomID,
+    });
   });
 };
 
@@ -316,6 +370,7 @@ const handleStartGame = (socket) => {
     if (allReady) {
       room.state = 'playing';
       socket.emit('Message', {
+        event: 'Start_Game',
         type: 'success',
         msg: 'started room successfully',
       });
@@ -343,8 +398,11 @@ const handleDisconnection = (socket) => {
             isLeader: true,
           });
         } else if (value.playerList.size === 0) rooms.delete(key);
+        socket.leave(key);
       }
     });
+
+    onlinePlayers.delete(socket.id);
     connections--;
     console.log(`user ${playerID} disconnected`);
   });
@@ -400,9 +458,12 @@ const handleBroadcast = (io) => {
 
 const handleConsoleLog = (io) => {
   setInterval(() => {
+    console.log('rooms');
     console.log(rooms);
+    console.log('onlinePlayers');
+    console.log(onlinePlayers);
     console.log('connection : ', connections);
-  }, 1000);
+  }, 1500);
 };
 
 const initailize = (socket) => {

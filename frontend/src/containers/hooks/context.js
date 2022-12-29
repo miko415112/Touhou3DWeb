@@ -4,6 +4,7 @@ const UserContext = createContext({
   google: '',
   name: '',
   friends: [],
+  onlineFriends: [],
   requests: [],
   roomID: '',
   playerID: '',
@@ -12,6 +13,7 @@ const UserContext = createContext({
   setSignIn: () => {},
   setGoogle: () => {},
   setFriends: () => {},
+  setOnlineFriends: () => {},
   setRequests: () => {},
   setName: () => {},
   setRoomID: () => {},
@@ -27,6 +29,7 @@ export const UserProvider = (props) => {
   const [google, setGoogle] = useState('');
   const [name, setName] = useState('');
   const [friends, setFriends] = useState([]);
+  const [onlineFriends, setOnlineFriends] = useState([]);
   const [requests, setRequests] = useState([]);
   const [roomID, setRoomID] = useState('');
   const [playerID, setPlayerID] = useState('');
@@ -40,15 +43,18 @@ export const UserProvider = (props) => {
         google,
         name,
         friends,
+        onlineFriends,
         requests,
         roomID,
         playerID,
         location,
         modelName,
+        onlineFriends,
         setSignIn,
         setGoogle,
         setName,
         setFriends,
+        setOnlineFriends,
         setRequests,
         setRoomID,
         setPlayerID,

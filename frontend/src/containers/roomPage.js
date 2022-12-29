@@ -12,6 +12,7 @@ import { OptionPanel } from '../components/optionPanel';
 import { useUser } from './hooks/context';
 import { displayRoomID, displayStatus } from '../components/info';
 import { useNetwork } from './hooks/network';
+import { InviteModal } from '../components/modal';
 
 const keymap = {
   ArrowUp: 'up',
@@ -61,26 +62,65 @@ const SectionWrapper = styled.div`
 `;
 
 const RoomPage = () => {
-  const [selection, setSelection] = useState(3);
-  const [modelIndex, setModelIndex] = useState(0);
-  const [state, setState] = useState('choosing');
-  const { location, setLocation, roomID, playerID, modelName, setModelName } =
-    useUser();
-  const { message, playerList, roomState, leaveRoom, startGame, updatePlayer } =
-    useNetwork();
-  const [me, setMe] = useState();
-  const [others, setOthers] = useState();
-  const navigate = useNavigate();
-  const optionNumber = 4;
-  const textOptions = ['Start', 'Quit', 'RoomID'];
+  //optionPanel
+  const [selection, setSelection] = useState(4);
+  const optionNumber = 5;
+  const textOptions = ['Start', 'Quit', 'Invite', 'RoomID'];
   const movement = useKeyboard(keymap);
 
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+
+  //save data
+  const [modelIndex, setModelIndex] = useState(0);
+  const [state, setState] = useState('choosing');
+  const [me, setMe] = useState();
+  const [others, setOthers] = useState();
+  const {
+    google,
+    friends,
+    onlineFriends,
+    location,
+    roomID,
+    playerID,
+    modelName,
+    setFriends,
+    setOnlineFriends,
+    setLocation,
+    setModelName,
+  } = useUser();
+
+  //useNetwork
+  const {
+    message,
+    playerList,
+    roomState,
+    leaveRoom,
+    inviteFriend,
+    startGame,
+    updatePlayer,
+    openFriendSystem,
+  } = useNetwork();
+
+  //switch pages
+  const navigate = useNavigate();
+
+  //bind 3D model  to div
   const canvasRef = useRef();
   const player0Ref = useRef();
   const player1Ref = useRef();
   const player2Ref = useRef();
   const player3Ref = useRef();
   const playerRefArray = useRef([player1Ref, player2Ref, player3Ref]);
+
+  const OnInviteFriend = (email_to) => {
+    inviteFriend(playerID, email_to, roomID);
+  };
+
+  useEffect(() => {
+    if (location === 'game') navigate('/game', { replace: true });
+    else if (location === 'room') navigate('/room', { replace: true });
+    else if (location === 'home') navigate('/', { replace: true });
+  }, [location]);
 
   useEffect(() => {
     const newMe = playerList?.filter(
@@ -100,7 +140,6 @@ const RoomPage = () => {
 
     setMe(newMe);
     setOthers(newOthers);
-    console.log(playerID);
   }, [playerList]);
 
   useEffect(() => {
@@ -111,12 +150,6 @@ const RoomPage = () => {
   }, [roomState]);
 
   useEffect(() => {
-    if (location === 'game') navigate('/game', { replace: true });
-    else if (location === 'room') navigate('/room', { replace: true });
-    else if (location === 'home') navigate('/', { replace: true });
-  }, [location]);
-
-  useEffect(() => {
     let newSelection = selection;
     if (movement.up) newSelection = selection - 1;
     if (movement.down) newSelection = selection + 1;
@@ -124,7 +157,7 @@ const RoomPage = () => {
     if (newSelection <= -1) newSelection = newSelection + optionNumber;
     setSelection(newSelection);
 
-    if (newSelection === 3) {
+    if (newSelection === optionNumber - 1) {
       let newModelIndex = modelIndex;
       if (movement.right) newModelIndex++;
       if (movement.left) newModelIndex--;
@@ -144,9 +177,13 @@ const RoomPage = () => {
           setLocation('home');
           break;
         case 2:
-          displayRoomID(roomID);
+          openFriendSystem(google.email);
+          setInviteModalOpen(true);
           break;
         case 3:
+          displayRoomID(roomID);
+          break;
+        case 4:
           setState('ready');
           setSelection(0);
           break;
@@ -164,12 +201,27 @@ const RoomPage = () => {
   useEffect(() => {
     displayStatus(message);
     if (message.type === 'success') {
-      setLocation('game');
+      switch (message.event) {
+        case 'Start_Game':
+          setLocation('game');
+          break;
+        case 'Open_FriendSystem':
+          setOnlineFriends(message.onlineFriends);
+          setFriends(message.friends);
+          break;
+      }
     }
   }, [message]);
 
   return (
     <>
+      <InviteModal
+        open={inviteModalOpen}
+        friends={friends}
+        onInvite={OnInviteFriend}
+        onlineFriends={onlineFriends}
+        onCancel={() => setInviteModalOpen(false)}
+      ></InviteModal>
       <RoomPageWrapper ref={canvasRef}>
         <PlayerSectionWrapper>
           <SectionWrapper>
@@ -178,7 +230,7 @@ const RoomPage = () => {
               name={me?.name}
               state={me?.state}
               isLeader={me?.isLeader}
-              showArrow={selection === 3}
+              showArrow={selection === optionNumber - 1}
             />
           </SectionWrapper>
           <SectionWrapper>

@@ -61,6 +61,15 @@ const deleteRequest = (email_from, email_to) => {
   socket.emit('Delete_Request', data);
 };
 
+const inviteFriend = (playerID, email_to, roomID) => {
+  const data = {
+    playerID,
+    email_to,
+    roomID,
+  };
+  socket.emit('Invite_Friend', data);
+};
+
 const createRoom = (email, name) => {
   const data = {
     email,
@@ -132,6 +141,7 @@ export const useNetwork = () => {
     acceptFriend,
     deleteFriend,
     deleteRequest,
+    inviteFriend,
     createRoom,
     joinRoom,
     leaveRoom,
