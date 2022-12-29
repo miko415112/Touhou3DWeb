@@ -43,7 +43,7 @@ export const displayStatus = (s) => {
       case 'success':
         message.success({
           content: msg,
-          duration: 4,
+          duration: 3,
           icon: <CheckCircleFilled style={{ fontSize: '25px' }} />,
           style: { fontSize: '20px' },
         });
@@ -51,7 +51,7 @@ export const displayStatus = (s) => {
       case 'error':
         message.error({
           content: msg,
-          duration: 4,
+          duration: 3,
           icon: <CloseCircleFilled style={{ fontSize: '25px' }} />,
           style: { fontSize: '20px' },
         });

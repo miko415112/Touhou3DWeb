@@ -4,15 +4,33 @@ import { Manager } from 'socket.io-client';
 const manager = new Manager('http://localhost:4000');
 const socket = manager.socket('/');
 
-const createRoom = (name) => {
+const signInGame = (email, name) => {
   const data = {
+    email,
+    name,
+  };
+  socket.emit('SignIn', data);
+};
+
+const changeName = (email, name) => {
+  const data = {
+    email,
+    name,
+  };
+  socket.emit('Change_Name', data);
+};
+
+const createRoom = (email, name) => {
+  const data = {
+    email,
     name,
   };
   socket.emit('Create_Room', data);
 };
 
-const joinRoom = (name, roomID) => {
+const joinRoom = (email, name, roomID) => {
   const data = {
+    email,
     name,
     roomID,
   };
@@ -61,12 +79,13 @@ export const useNetwork = () => {
     socket.on('Room_Info', (room) => {
       setPlayerList(room.playerList);
       setRoomState(room.state);
-      console.log(room);
     });
   }, []);
 
   return {
     updatePlayer,
+    signInGame,
+    changeName,
     createRoom,
     joinRoom,
     leaveRoom,

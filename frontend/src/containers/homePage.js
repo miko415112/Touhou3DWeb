@@ -7,7 +7,7 @@ import { homeBackgroundImage } from '../components/resource';
 import { useKeyboard } from './hooks/input';
 import {
   JoinRoomModal,
-  CreateRoomModal,
+  ChangeNameModal,
   SignInModal,
 } from '../components/modal';
 import { OptionPanel } from '../components/optionPanel';
@@ -45,10 +45,12 @@ const HomePageWrapper = styled.div`
 `;
 
 const HomePage = () => {
-  const { createRoom, joinRoom, message } = useNetwork();
+  const { signInGame, changeName, createRoom, joinRoom, message } =
+    useNetwork();
   const {
     location,
     signIn,
+    name,
     google,
     setSignIn,
     setGoogle,
@@ -59,12 +61,11 @@ const HomePage = () => {
   } = useUser();
   const movement = useKeyboard(keymap);
   const [selection, setSelection] = useState(0);
-  const [joinRoomModalOpen, SetJoinRoomModalOpen] = useState(false);
-  const [createRoomModalOpen, SetCreateRoomModalOpen] = useState(false);
+  const [joinRoomModalOpen, setJoinRoomModalOpen] = useState(false);
+  const [changeNameModalOpen, setChangeNameModalOpen] = useState(false);
   const navigate = useNavigate();
   const optionNumber = 4;
   const options = ['Create Game', 'Join Game', 'Change Name', 'Log Out'];
-
   useEffect(() => {
     if (location === 'game') navigate('/game', { replace: true });
     else if (location === 'room') navigate('/room', { replace: true });
@@ -81,10 +82,16 @@ const HomePage = () => {
     if (movement.select) {
       switch (selection) {
         case 0:
-          SetCreateRoomModalOpen(true);
+          OnCreateRoom();
           break;
         case 1:
-          SetJoinRoomModalOpen(true);
+          setJoinRoomModalOpen(true);
+          break;
+        case 2:
+          setChangeNameModalOpen(true);
+          break;
+        case 3:
+          OnLogOut();
           break;
       }
     }
@@ -93,49 +100,70 @@ const HomePage = () => {
   useEffect(() => {
     displayStatus(message);
     if (message.type === 'success') {
-      setPlayerID(message.playerID);
-      setRoomID(message.roomID);
-      setName(message.name);
-      setLocation('room');
+      switch (message.event) {
+        case 'SignIn':
+          setName(message.name);
+          break;
+        case 'Change_Name':
+          setName(message.name);
+          break;
+        case 'Create_Room':
+          setPlayerID(message.playerID);
+          setRoomID(message.roomID);
+          setLocation('room');
+          break;
+        case 'Join_Room':
+          setPlayerID(message.playerID);
+          setRoomID(message.roomID);
+          setLocation('room');
+          break;
+      }
     }
   }, [message]);
 
-  const OnCreateRoom = (values) => {
-    const name = values.name;
-    createRoom(name);
-    SetCreateRoomModalOpen(false);
+  const OnCreateRoom = () => {
+    createRoom(google.email, name);
   };
 
   const OnJoinRoom = (values) => {
-    const name = values.name;
     const roomID = values.roomID;
-    joinRoom(name, roomID);
-    SetJoinRoomModalOpen(false);
+    joinRoom(google.email, name, roomID);
+    setJoinRoomModalOpen(false);
   };
 
   const OnSignIn = (response) => {
-    console.log(response.credential);
     const user = jwt_decode(response.credential);
     setGoogle(user);
+    signInGame(user.email, user.name);
     setSignIn(true);
-    console.log(user);
+  };
+
+  const OnSaveName = (values) => {
+    changeName(google.email, values.name);
+    setChangeNameModalOpen(false);
+  };
+
+  const OnLogOut = () => {
+    setSignIn(false);
+    setGoogle(null);
+    setName('');
   };
 
   return (
     <>
+      <ChangeNameModal
+        open={changeNameModalOpen}
+        onCancel={() => setChangeNameModalOpen(false)}
+        onSave={OnSaveName}
+      />
       <JoinRoomModal
         open={joinRoomModalOpen}
-        onCancel={() => SetJoinRoomModalOpen(false)}
+        onCancel={() => setJoinRoomModalOpen(false)}
         onJoin={OnJoinRoom}
-      />
-      <CreateRoomModal
-        open={createRoomModalOpen}
-        onCancel={() => SetCreateRoomModalOpen(false)}
-        onCreate={OnCreateRoom}
       />
       <SignInModal open={signIn !== true} callback={OnSignIn} />
       <HomePageWrapper>
-        {signIn ? <Profile src={google?.picture} name={google?.name} /> : null}
+        {signIn ? <Profile src={google?.picture} name={name} /> : null}
         <OptionPanel options={options} selection={selection} />
       </HomePageWrapper>
     </>

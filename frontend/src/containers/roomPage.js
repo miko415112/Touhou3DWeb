@@ -100,6 +100,7 @@ const RoomPage = () => {
 
     setMe(newMe);
     setOthers(newOthers);
+    console.log(playerID);
   }, [playerList]);
 
   useEffect(() => {

@@ -12,6 +12,8 @@ export const registerHandler = (io) => {
 const handleConnection = (io) => {
   io.on('connection', function (socket) {
     handleDisconnection(socket);
+    handleSignIn(socket);
+    handleChangeName(socket);
     handleCreateRoom(socket);
     handleJoinRoom(socket);
     handleStartGame(socket);
@@ -22,12 +24,47 @@ const handleConnection = (io) => {
   });
 };
 
+const handleSignIn = (socket) => {
+  socket.on('SignIn', async ({ email, name }) => {
+    let user = await UserModel.findOne({ email: email });
+    if (!user) user = await new UserModel({ email: email, name: name }).save();
+
+    socket.emit('Message', {
+      event: 'SignIn',
+      type: 'success',
+      msg: 'signed in successfully',
+      name: user.name,
+    });
+
+    console.log(`user ${email} signIn`);
+  });
+};
+
+const handleChangeName = (socket) => {
+  socket.on('Change_Name', async ({ email, name }) => {
+    let user = await UserModel.findOne({ email: email });
+    if (!user) await new UserModel({ email: email, name: name }).save();
+    else await UserModel.updateOne({ email: email }, { $set: { name: name } });
+
+    socket.emit('Message', {
+      event: 'Change_Name',
+      type: 'success',
+      msg: 'changed name successfully',
+      name: name,
+    });
+
+    console.log(`user update name :${name}`);
+  });
+};
+
 const handleCreateRoom = (socket) => {
-  socket.on('Create_Room', ({ name }) => {
+  socket.on('Create_Room', ({ email, name }) => {
     const roomID = uuid4();
     const playerID = socket.id;
     const playerList = new Map();
+
     playerList.set(playerID, {
+      email: email,
       name: name,
       modelName: 'Remilia',
       state: 'choosing',
@@ -38,19 +75,19 @@ const handleCreateRoom = (socket) => {
 
     socket.join(roomID);
     socket.emit('Message', {
+      event: 'Create_Room',
       type: 'success',
       msg: 'created room successfully',
       roomID: roomID,
       playerID: playerID,
-      name: name,
     });
 
-    console.log(`user ${playerID} created room ${roomID}`);
+    console.log(`user ${email} created room ${roomID}`);
   });
 };
 
 const handleJoinRoom = (socket) => {
-  socket.on('Join_Room', ({ name, roomID }) => {
+  socket.on('Join_Room', ({ email, name, roomID }) => {
     const playerID = socket.id;
     const room = rooms.get(roomID);
 
@@ -70,6 +107,7 @@ const handleJoinRoom = (socket) => {
       return;
     }
     room.playerList.set(playerID, {
+      email: email,
       name: name,
       modelName: 'Remilia',
       state: 'choosing',
@@ -78,14 +116,14 @@ const handleJoinRoom = (socket) => {
 
     socket.join(roomID);
     socket.emit('Message', {
+      event: 'Join_Room',
       type: 'success',
       msg: 'joined room successfully',
       roomID: roomID,
       playerID: playerID,
-      name: name,
     });
 
-    console.log(`user ${playerID} joined room ${roomID}`);
+    console.log(`user ${email} joined room ${roomID}`);
   });
 };
 

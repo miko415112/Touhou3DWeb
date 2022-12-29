@@ -78,30 +78,29 @@ export const JoinRoomModal = ({ open, onJoin, onCancel }) => {
   );
 };
 
-export const CreateRoomModal = ({ open, onCreate, onCancel }) => {
+export const ChangeNameModal = ({ open, onSave, onCancel }) => {
   const [form] = Form.useForm();
   return (
     <Modal
       open={open}
-      title='Create a new room'
-      okText='Create'
+      okText='Save'
       cancelText='Cancel'
       onCancel={onCancel}
       onOk={() => {
         form.validateFields().then((values) => {
           form.resetFields();
-          onCreate(values);
+          onSave(values);
         });
       }}
     >
       <Form form={form} layout='vertical' name='form_in_modal'>
-        <TouhouFont>Name</TouhouFont>
+        <TouhouFont>Enter your new name</TouhouFont>
         <Form.Item
           name='name'
           rules={[
             {
               required: true,
-              message: 'Error: Please enter your Name',
+              message: 'Error: Please enter your name',
             },
           ]}
         >
