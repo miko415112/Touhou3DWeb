@@ -67,6 +67,7 @@ const HomePage = () => {
   //useNetwork
   const {
     signInGame,
+    logOutGame,
     changeName,
     openFriendSystem,
     addFriend,
@@ -178,6 +179,11 @@ const HomePage = () => {
             });
           }
           break;
+        case 'LogOut':
+          setSignIn(false);
+          setGoogle(null);
+          setName('');
+          break;
       }
     }
   }, [message]);
@@ -225,9 +231,7 @@ const HomePage = () => {
   };
 
   const OnLogOut = () => {
-    setSignIn(false);
-    setGoogle(null);
-    setName('');
+    logOutGame(google.email);
   };
 
   return (

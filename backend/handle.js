@@ -14,6 +14,7 @@ const handleConnection = (io) => {
   io.on('connection', function (socket) {
     handleDisconnection(socket);
     handleSignIn(socket);
+    handleLogOut(socket);
     handleChangeName(socket);
     handleCreateRoom(socket);
     handleJoinRoom(socket);
@@ -381,6 +382,21 @@ const handleStartGame = (socket) => {
       });
     }
     console.log(`room ${roomID} started`);
+  });
+};
+
+const handleLogOut = (socket) => {
+  socket.on('LogOut', (email) => {
+    const playerID = socket.id;
+    onlinePlayers.delete(playerID);
+
+    socket.emit('Message', {
+      event: 'LogOut',
+      type: 'success',
+      msg: 'LogOut successfully',
+    });
+
+    console.log(`user ${email} LogOut`);
   });
 };
 

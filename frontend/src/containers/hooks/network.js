@@ -13,6 +13,13 @@ const signInGame = (email, name, picture) => {
   socket.emit('SignIn', data);
 };
 
+const logOutGame = (email) => {
+  const data = {
+    email,
+  };
+  socket.emit('LogOut', data);
+};
+
 const openFriendSystem = (email) => {
   const data = {
     email,
@@ -135,6 +142,7 @@ export const useNetwork = () => {
   return {
     updatePlayer,
     signInGame,
+    logOutGame,
     changeName,
     openFriendSystem,
     addFriend,
