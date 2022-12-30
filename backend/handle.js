@@ -26,7 +26,7 @@ const handleConnection = (io) => {
     handleDeleteRequest(socket);
     handleStartGame(socket);
     handleLeaveRoom(socket);
-    handlePlayerStateChange(socket);
+    handleUpdatePlayer(socket);
     connections++;
     console.log(`user ${socket.id} connected`);
   });
@@ -442,8 +442,8 @@ const handleLeaveRoom = (socket) => {
   });
 };
 
-const handlePlayerStateChange = (socket) => {
-  socket.on('Player_State_Change', ({ roomID, playerID, props }) => {
+const handleUpdatePlayer = (socket) => {
+  socket.on('Update_Player', ({ roomID, playerID, props }) => {
     const room = rooms.get(roomID);
     if (!room) return;
     const prev = room.playerList.get(playerID);
@@ -480,18 +480,4 @@ const handleConsoleLog = (io) => {
     console.log(onlinePlayers);
     console.log('connection : ', connections);
   }, 1500);
-};
-
-const initailize = (socket) => {
-  socket.on('playerStateChange', OnPlayerStateChange);
-};
-
-const OnPlayerStateChange = (data) => {
-  const index = playerList.findIndex((e) => e.name === data.name);
-  if (index !== -1) {
-    playerList[index] = data;
-  } else {
-    playerList.push(data);
-  }
-  console.log(data);
 };

@@ -115,7 +115,7 @@ const updatePlayer = (roomID, playerID, props) => {
     playerID: playerID,
     props,
   };
-  socket.emit('Player_State_Change', data);
+  socket.emit('Update_Player', data);
 };
 
 export const useNetwork = () => {

@@ -3,7 +3,7 @@ import { useSphere } from '@react-three/cannon';
 import { Euler, Quaternion, Vector3 } from 'three';
 import { useKeyboard, useMouse } from './input';
 
-const move_speed = 8;
+const move_speed = 4;
 const yaw_speed = 1;
 const yaw_deflection = Math.PI / 6;
 const pitch_deflection = Math.PI / 6;

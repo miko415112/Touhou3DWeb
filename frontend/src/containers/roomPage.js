@@ -36,7 +36,7 @@ const RoomPageWrapper = styled.div`
 
   .canvas {
     position: fixed !important;
-    top: -30px;
+    top: 0px;
     left: 0px;
   }
 `;
@@ -68,6 +68,7 @@ const RoomPage = () => {
   const textOptions = ['Start', 'Quit', 'Invite', 'RoomID'];
   const movement = useKeyboard(keymap);
 
+  //control modal
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   //save data
@@ -82,7 +83,6 @@ const RoomPage = () => {
     location,
     roomID,
     playerID,
-    modelName,
     setFriends,
     setOnlineFriends,
     setLocation,
@@ -140,11 +140,11 @@ const RoomPage = () => {
 
     setMe(newMe);
     setOthers(newOthers);
+    setModelName(newMe?.modelName);
   }, [playerList]);
 
   useEffect(() => {
     if (roomState === 'playing') {
-      setModelName(me.modelName);
       setLocation('game');
     }
   }, [roomState]);

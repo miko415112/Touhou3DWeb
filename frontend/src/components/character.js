@@ -1,15 +1,37 @@
-import { RemiliaModel, YuumuModel } from './resource';
+import {
+  RemiliaModel,
+  KoishiModel,
+  SuwakoModel,
+  SakuyaModel,
+  SanaeModel,
+  MeilingModel,
+} from './resource';
 import { useState, useEffect } from 'react';
 import { Euler, Quaternion, Vector3 } from 'three';
 
-export const characterList = ['Remilia', 'Yuumu'];
+export const characterList = [
+  'Remilia',
+  'Koishi',
+  'Suwako',
+  'Sakuya',
+  'Sanae',
+  'Meiling',
+];
 
 export const Character = (props) => {
   switch (props.modelName) {
     case 'Remilia':
       return <RemiliaModel {...props} />;
-    case 'Yuumu':
-      return <YuumuModel {...props} />;
+    case 'Koishi':
+      return <KoishiModel {...props} />;
+    case 'Suwako':
+      return <SuwakoModel {...props} />;
+    case 'Sakuya':
+      return <SakuyaModel {...props} />;
+    case 'Sanae':
+      return <SanaeModel {...props} />;
+    case 'Meiling':
+      return <MeilingModel {...props} />;
   }
   return <RemiliaModel {...props} />;
 };

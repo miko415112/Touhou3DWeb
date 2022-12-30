@@ -36,10 +36,9 @@ export const getGroundTexture = () => {
 export const RemiliaModel = (props) => {
   const { nodes, materials } = useGLTF('/model/Remilia/Scene.gltf');
   return (
-    <group dispose={null}>
-      <group>
+    <group {...props} dispose={null}>
+      <group position={[0, 2, 0]}>
         <mesh
-          {...props}
           geometry={nodes.Object_2.geometry}
           material={materials.Material_0}
         />
@@ -48,22 +47,80 @@ export const RemiliaModel = (props) => {
   );
 };
 
-export const YuumuModel = (props) => {
-  const { nodes, materials } = useGLTF('/model/Yuumu/Scene.gltf');
+export const KoishiModel = (props) => {
+  const { nodes, materials } = useGLTF('/model/Koishi/Scene.gltf');
   return (
-    <group
-      position={[0, -3, 0]}
-      rotation={[-Math.PI, 0, 0]}
-      scale={0.6}
-      dispose={null}
-    >
-      <group>
+    <group {...props} dispose={null}>
+      <group position={[0, -135, 0]} rotation={[0, Math.PI / 2, 0]} scale={0.8}>
         <mesh
-          {...props}
-          geometry={nodes.Object_2.geometry}
-          material={materials.Youmu_low_Material_u1_v1}
+          geometry={nodes.Object_4.geometry}
+          material={materials.Material_u1_v1}
+        />
+        <mesh
+          geometry={nodes.Object_5.geometry}
+          material={materials.Material_u1_v1}
         />
       </group>
+    </group>
+  );
+};
+
+export const SuwakoModel = (props) => {
+  const { nodes, materials } = useGLTF('/model/Suwako/Scene.gltf');
+  return (
+    <group {...props} dispose={null}>
+      <group position={[0, -10, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh
+          geometry={nodes.Object_4.geometry}
+          material={materials['Material.001']}
+        />
+      </group>
+    </group>
+  );
+};
+
+export const MeilingModel = (props) => {
+  const { nodes, materials } = useGLTF('/model/Meiling/Scene.gltf');
+  return (
+    <group {...props} dispose={null}>
+      <mesh
+        geometry={nodes.Object_4.geometry}
+        material={materials.Material_u1_v1}
+        rotation={[0, 0, 0]}
+        position={[0, -9, 0]}
+      />
+    </group>
+  );
+};
+
+export const SakuyaModel = (props) => {
+  const { nodes, materials } = useGLTF('/model/Sakuya/Scene.gltf');
+  return (
+    <group {...props} dispose={null}>
+      <group scale={1}>
+        <mesh
+          geometry={nodes.Object_Material001_0.geometry}
+          material={materials['Material.001']}
+          position={[0, -13, 0]}
+          rotation={[0, -Math.PI / 2, 0]}
+          scale={180}
+        />
+      </group>
+    </group>
+  );
+};
+
+export const SanaeModel = (props) => {
+  const { nodes, materials } = useGLTF('/model/Sanae/Scene.gltf');
+  return (
+    <group {...props} dispose={null}>
+      <mesh
+        geometry={nodes.Object_4.geometry}
+        material={materials.Material_u1_v1}
+        rotation={[-0, 0, 0]}
+        position={[0, -9, 0]}
+        scale={0.7}
+      />
     </group>
   );
 };
@@ -74,4 +131,8 @@ export const nameBorderImage = require('../resource/nameBorder.png');
 export const charaBorderImage = require('../resource/charaBorder.png');
 
 useGLTF.preload('/model/Remilia/Scene.gltf');
-useGLTF.preload('/model/Yuumu/Scene.gltf');
+useGLTF.preload('/model/Koishi/Scene.gltf');
+useGLTF.preload('/model/Suwako/Scene.gltf');
+useGLTF.preload('/model/Meiling/Scene.gltf');
+useGLTF.preload('/model/Sakuya/Scene.gltf');
+useGLTF.preload('/model/Sanae/Scene.gltf');
