@@ -49,6 +49,8 @@ export const Character = (props) => {
     mass: 0,
     type: 'Kinematic',
     args: [1.3, 1.3, 1.3],
+    collisionFilterMask: 2,
+    collisionFilterGroup: 1,
     onCollideBegin: (e) => console.log(e),
   }));
 
@@ -59,8 +61,8 @@ export const Character = (props) => {
 
   return (
     <>
-      <mesh ref={ref}>
-        <boxGeometry args={showBox ? [1.3, 1.3, 1.3] : [0, 0, 0]} />
+      <mesh ref={ref} visible={showBox}>
+        <boxGeometry args={[1.3, 1.3, 1.3]} />
         <meshStandardMaterial />
       </mesh>
       <Model {...props} />

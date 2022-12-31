@@ -13,6 +13,9 @@ const keyMap = {
   KeyS: 'pitch_down',
   KeyA: 'yaw_left',
   KeyD: 'yaw_right',
+  KeyJ: 'shoot1',
+  KeyK: 'shoot2',
+  KeyL: 'shoot3',
   Space: 'move_forward',
   ShiftLeft: 'speed_up',
 };
@@ -93,13 +96,12 @@ export const useControl = () => {
     cameraPos: new Vector3(0, 0, 3),
     cameraEuler: new Euler(0, 0, 0),
   });
-
+  const [fireState, setFireState] = useState([]);
   const [ref, api] = useSphere(() => ({
     mass: 0,
     type: 'Dynamic',
     position: [0, 0, 0],
   }));
-
   useEffect(() => {
     const unsubscibe = subscribeApi(api, setPos, setRot);
     return unsubscibe;
@@ -109,9 +111,19 @@ export const useControl = () => {
     trackSphere(pos, rot, keyboardMovement, setRigidState);
   }, [pos, rot]);
 
-  const velocity = calcVelocity(keyboardMovement, MouseMovement, rigidState);
-  api.velocity.set(...velocity.lin_velocity);
-  api.angularVelocity.set(...velocity.ang_velocity);
+  useEffect(() => {
+    const newFireState = [];
+    if (keyboardMovement.shoot1) newFireState.push('shoot1');
+    if (keyboardMovement.shoot2) newFireState.push('shoot2');
+    if (keyboardMovement.shoot3) newFireState.push('shoot3');
+    setFireState(newFireState);
+  }, [keyboardMovement]);
 
-  return { rigidState };
+  useEffect(() => {
+    const velocity = calcVelocity(keyboardMovement, MouseMovement, rigidState);
+    api.velocity.set(...velocity.lin_velocity);
+    api.angularVelocity.set(...velocity.ang_velocity);
+  }, [keyboardMovement, rigidState]);
+
+  return { rigidState, fireState };
 };

@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 import { useUser } from './hooks/context';
 
 export const LocalPlayer = () => {
-  const { rigidState } = useControl();
+  const { rigidState, fireState } = useControl();
   const { updatePlayer } = useNetwork();
   const { camera } = useThree();
   const { modelName, roomID, playerID } = useUser();
@@ -19,10 +19,10 @@ export const LocalPlayer = () => {
   useEffect(() => {
     curTime.current = Date.now();
     if (curTime.current - preUpdateTime.current > 80) {
-      updatePlayer(roomID, playerID, { rigidState });
+      updatePlayer(roomID, playerID, { rigidState, fireState });
       preUpdateTime.current = Date.now();
     }
-  }, [rigidState]);
+  }, [rigidState, fireState]);
 
   return (
     <>

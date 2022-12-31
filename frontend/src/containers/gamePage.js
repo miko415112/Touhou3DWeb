@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useKeyboard } from './hooks/input';
 import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
+import { Bullets } from './bullets';
 
 const GamePageWrapper = styled.div`
   width: 1200px;
@@ -39,6 +40,7 @@ const Scene = memo(() => {
       <Ground />
       <Physics>
         <Players />
+        <Bullets />
       </Physics>
     </Canvas>
   );
