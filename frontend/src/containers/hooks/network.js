@@ -127,9 +127,6 @@ export const useNetwork = () => {
     socket.on('connect', () => {
       console.log('connected');
     });
-    socket.on('playerStateChange', (newPlayerList) =>
-      setPlayerList(newPlayerList)
-    );
     socket.on('Message', (msg) => {
       setMessage(msg);
     });

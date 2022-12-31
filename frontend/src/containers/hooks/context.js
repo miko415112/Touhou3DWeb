@@ -10,6 +10,7 @@ const UserContext = createContext({
   playerID: '',
   location: '',
   modelName: '',
+  showBox: false,
   setSignIn: () => {},
   setGoogle: () => {},
   setFriends: () => {},
@@ -20,6 +21,7 @@ const UserContext = createContext({
   setPlayerID: () => {},
   setLocation: () => {},
   setModelName: () => {},
+  setShowBox: () => {},
 });
 
 export const useUser = () => useContext(UserContext);
@@ -35,6 +37,7 @@ export const UserProvider = (props) => {
   const [playerID, setPlayerID] = useState('');
   const [modelName, setModelName] = useState('Remilia');
   const [location, setLocation] = useState('home');
+  const [showBox, setShowBox] = useState(false);
 
   return (
     <UserContext.Provider
@@ -50,6 +53,7 @@ export const UserProvider = (props) => {
         location,
         modelName,
         onlineFriends,
+        showBox,
         setSignIn,
         setGoogle,
         setName,
@@ -60,6 +64,7 @@ export const UserProvider = (props) => {
         setPlayerID,
         setLocation,
         setModelName,
+        setShowBox,
       }}
       {...props}
     />

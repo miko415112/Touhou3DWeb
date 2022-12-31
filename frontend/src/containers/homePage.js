@@ -105,6 +105,8 @@ const HomePage = () => {
   }, [location]);
 
   useEffect(() => {
+    if (!signIn) return;
+
     let newSelection = selection;
     if (movement.up) newSelection = selection - 1;
     if (movement.down) newSelection = selection + 1;

@@ -9,6 +9,7 @@ import {
 import { useState, useEffect } from 'react';
 import { Euler, Quaternion, Vector3 } from 'three';
 import { useBox } from '@react-three/cannon';
+import { useUser } from '../containers/hooks/context';
 
 export const characterList = [
   'Remilia',
@@ -51,17 +52,17 @@ export const Character = (props) => {
     onCollideBegin: (e) => console.log(e),
   }));
 
+  const { showBox } = useUser();
+
   if (props.position !== undefined)
     api.position.set(props.position.x, props.position.y, props.position.z);
 
   return (
     <>
-      {props.showBox ? (
-        <mesh ref={ref}>
-          <boxGeometry args={[1.3, 1.3, 1.3]} transparent />
-          <meshStandardMaterial transparent />
-        </mesh>
-      ) : null}
+      <mesh ref={ref}>
+        <boxGeometry args={showBox ? [1.3, 1.3, 1.3] : [0, 0, 0]} />
+        <meshStandardMaterial />
+      </mesh>
       <Model {...props} />
     </>
   );
