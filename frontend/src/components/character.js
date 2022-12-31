@@ -8,6 +8,7 @@ import {
 } from './resource';
 import { useState, useEffect } from 'react';
 import { Euler, Quaternion, Vector3 } from 'three';
+import { useBox } from '@react-three/cannon';
 
 export const characterList = [
   'Remilia',
@@ -18,22 +19,52 @@ export const characterList = [
   'Meiling',
 ];
 
-export const Character = (props) => {
+const Model = (props) => {
   switch (props.modelName) {
     case 'Remilia':
       return <RemiliaModel {...props} />;
+      break;
     case 'Koishi':
       return <KoishiModel {...props} />;
+      break;
     case 'Suwako':
       return <SuwakoModel {...props} />;
+      break;
     case 'Sakuya':
       return <SakuyaModel {...props} />;
+      break;
     case 'Sanae':
       return <SanaeModel {...props} />;
+      break;
     case 'Meiling':
       return <MeilingModel {...props} />;
+      break;
   }
   return <RemiliaModel {...props} />;
+};
+
+export const Character = (props) => {
+  const [ref, api] = useBox(() => ({
+    mass: 0,
+    type: 'Kinematic',
+    args: [1.3, 1.3, 1.3],
+    onCollideBegin: (e) => console.log(e),
+  }));
+
+  if (props.position !== undefined)
+    api.position.set(props.position.x, props.position.y, props.position.z);
+
+  return (
+    <>
+      {props.showBox ? (
+        <mesh ref={ref}>
+          <boxGeometry args={[1.3, 1.3, 1.3]} transparent />
+          <meshStandardMaterial transparent />
+        </mesh>
+      ) : null}
+      <Model {...props} />
+    </>
+  );
 };
 
 export const RotationCharacter = ({ modelName, spin, scale }) => {

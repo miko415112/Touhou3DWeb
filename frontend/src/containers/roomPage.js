@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { useNavigate } from 'react-router-dom';
 import { View } from '@react-three/drei';
 import styled from 'styled-components';
+import { Physics } from '@react-three/cannon';
 
 import { roomBackgroundImage } from '../components/resource';
 import { RotationCharacter, characterList } from '../components/character';
@@ -247,26 +248,28 @@ const RoomPage = () => {
           </SectionWrapper>
         </PlayerSectionWrapper>
         <Canvas eventSource={canvasRef} className='canvas'>
-          {
-            <View track={player0Ref}>
-              <RotationCharacter
-                spin={me?.state === 'choosing'}
-                modelName={me?.modelName}
-                scale={0.23}
-              />
-            </View>
-          }
-          {others?.map((other, index) =>
-            other.state !== 'waiting' ? (
-              <View track={playerRefArray.current[index]} key={index}>
+          <Physics>
+            {
+              <View track={player0Ref}>
                 <RotationCharacter
-                  spin={other.state === 'choosing'}
-                  modelName={other.modelName}
+                  spin={me?.state === 'choosing'}
+                  modelName={me?.modelName}
                   scale={0.23}
                 />
               </View>
-            ) : null
-          )}
+            }
+            {others?.map((other, index) =>
+              other.state !== 'waiting' ? (
+                <View track={playerRefArray.current[index]} key={index}>
+                  <RotationCharacter
+                    spin={other.state === 'choosing'}
+                    modelName={other.modelName}
+                    scale={0.23}
+                  />
+                </View>
+              ) : null
+            )}
+          </Physics>
         </Canvas>
         <OptionSectionWrapper>
           <OptionPanel options={textOptions} selection={selection} />

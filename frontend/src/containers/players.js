@@ -12,7 +12,6 @@ export const Players = () => {
   const curPlayerList = useRef();
   const { playerID } = useUser();
 
-  console.log(playerList);
   useEffect(() => {
     prevPlayerList.current = curPlayerList.current;
     curPlayerList.current = playerList;
@@ -22,6 +21,8 @@ export const Players = () => {
   useFrame(() => {
     if (!prevPlayerList.current) return;
     if (!prevPlayerList.current[0].rigidState) return;
+    if (typeof prevPlayerList.current[0].rigidState.modelPos !== Vector3)
+      return;
 
     for (let i = 0; i < playerList.length; i++) {
       //convert array to Vector3

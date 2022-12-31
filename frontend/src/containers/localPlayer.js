@@ -12,10 +12,10 @@ export const LocalPlayer = () => {
   const { modelName, roomID, playerID } = useUser();
   const preUpdateTime = useRef(0);
   const curTime = useRef(0);
-  const name = useRef(Date.now());
 
   camera.position.copy(rigidState.cameraPos);
   camera.rotation.setFromVector3(rigidState.cameraEuler);
+
   useEffect(() => {
     curTime.current = Date.now();
     if (curTime.current - preUpdateTime.current > 80) {
@@ -28,8 +28,8 @@ export const LocalPlayer = () => {
     <>
       <Character
         modelName={modelName}
-        position={rigidState.modelPos}
-        rotation={rigidState.modelEuler}
+        position={rigidState?.modelPos}
+        rotation={rigidState?.modelEuler}
         scale={0.1}
       />
     </>
