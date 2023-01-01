@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSphere } from '@react-three/cannon';
 import { useNetwork } from './hooks/network';
 import { Vector3 } from 'three';
@@ -47,30 +47,38 @@ const Bullet = memo((props) => {
 export const Bullets = () => {
   const [bulletList, setBulletList] = useState([]);
   const { playerList } = useNetwork();
-
+  const count = useRef();
   useEffect(() => {
-    const newBulletList = [...bulletList];
-    for (let i = 0; i < playerList?.length; i++) {
-      const player = playerList[i];
-      for (let j = 0; j < player.fireState?.length; j++) {
-        newBulletList.push({
-          playerID: player.playerID,
-          modelName: player.modelName,
-          type: player.fireState[j],
-          key: Date.now(),
-          origin: player.rigidState,
-        });
+    setBulletList((prev) => {
+      const newBulletList = [...prev];
+      for (let i = 0; i < playerList?.length; i++) {
+        const player = playerList[i];
+        for (let j = 0; j < player.fireState?.length; j++) {
+          count.current++;
+          newBulletList.push({
+            playerID: player.playerID,
+            modelName: player.modelName,
+            type: player.fireState[j],
+            key: Date.now(),
+            origin: player.rigidState,
+          });
+        }
       }
-    }
-
-    setBulletList(newBulletList);
+      return newBulletList;
+    });
   }, [playerList]);
+
+  //debug
+  useEffect(() => {
+    count.current = 0;
+  }, []);
 
   useFrame(() => {
     const newBulletList = bulletList.filter(({ key }) => {
-      return Date.now() - key < 3000;
+      return Date.now() - key < 5000;
     });
     setBulletList(newBulletList);
+    console.log(count.current);
   });
 
   return bulletList.map((bulletProps) => {

@@ -77,18 +77,10 @@ const RoomPage = () => {
   const [state, setState] = useState('choosing');
   const [me, setMe] = useState();
   const [others, setOthers] = useState();
-  const {
-    google,
-    friends,
-    onlineFriends,
-    location,
-    roomID,
-    playerID,
-    setFriends,
-    setOnlineFriends,
-    setLocation,
-    setModelName,
-  } = useUser();
+  const [friends, setFriends] = useState([]);
+  const [onlineFriends, setOnlineFriends] = useState([]);
+  const { google, location, roomID, playerID, setLocation, setModelName } =
+    useUser();
 
   //useNetwork
   const {

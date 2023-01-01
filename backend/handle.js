@@ -291,7 +291,7 @@ const handleDeleteRequest = (socket) => {
 };
 
 const handleCreateRoom = (socket) => {
-  socket.on('Create_Room', ({ email, name }) => {
+  socket.on('Create_Room', ({ email, name, picture }) => {
     const roomID = uuid4();
     const playerID = socket.id;
     const playerList = new Map();
@@ -302,6 +302,7 @@ const handleCreateRoom = (socket) => {
       modelName: 'Remilia',
       state: 'choosing',
       isLeader: true,
+      picture: picture,
     });
 
     rooms.set(roomID, { playerList: playerList, state: 'choosing' });
@@ -320,7 +321,7 @@ const handleCreateRoom = (socket) => {
 };
 
 const handleJoinRoom = (socket) => {
-  socket.on('Join_Room', ({ email, name, roomID }) => {
+  socket.on('Join_Room', ({ email, name, roomID, picture }) => {
     const playerID = socket.id;
     const room = rooms.get(roomID);
 
@@ -345,6 +346,7 @@ const handleJoinRoom = (socket) => {
       modelName: 'Remilia',
       state: 'choosing',
       isLeader: false,
+      picture: picture,
     });
 
     socket.join(roomID);
@@ -468,7 +470,7 @@ const handleBroadcast = (io) => {
       };
       io.to(roomID).emit('Room_Info', payload);
     });
-  }, 80);
+  }, 60);
   console.log('start broadcasting');
 };
 

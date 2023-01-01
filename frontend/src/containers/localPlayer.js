@@ -2,7 +2,7 @@ import { Character } from '../components/character';
 import { useControl } from './hooks/control';
 import { useThree } from '@react-three/fiber';
 import { useNetwork } from './hooks/network';
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from './hooks/context';
 
 export const LocalPlayer = () => {
@@ -10,6 +10,7 @@ export const LocalPlayer = () => {
   const { updatePlayer } = useNetwork();
   const { camera } = useThree();
   const { modelName, roomID, playerID } = useUser();
+  const [healthPoints, setHealthPoints] = useState(3);
   const preUpdateTime = useRef(0);
   const curTime = useRef(0);
 
@@ -19,10 +20,14 @@ export const LocalPlayer = () => {
   useEffect(() => {
     curTime.current = Date.now();
     if (curTime.current - preUpdateTime.current > 80) {
-      updatePlayer(roomID, playerID, { rigidState, fireState });
+      updatePlayer(roomID, playerID, {
+        rigidState,
+        fireState,
+        healthPoints,
+      });
       preUpdateTime.current = Date.now();
     }
-  }, [rigidState, fireState]);
+  }, [rigidState, fireState, healthPoints]);
 
   return (
     <>

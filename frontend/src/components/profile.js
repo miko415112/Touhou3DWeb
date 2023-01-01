@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-const RowWrapper = styled.div`
+import { AimOutlined } from '@ant-design/icons';
+
+const HomeRowWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -14,13 +16,42 @@ const RowWrapper = styled.div`
   }
 `;
 
-export const Profile = ({ src, name }) => {
+const GameRowWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  color: White;
+  font-size: 18pt;
+  gap: 20px;
+
+  img {
+    width: 40px;
+    height: 40px;
+  }
+`;
+
+export const HomePageProfile = ({ src, name }) => {
   return (
     <div className='profile'>
-      <RowWrapper>
+      <HomeRowWrapper>
         <img src={src} />
         <div>{name}</div>
-      </RowWrapper>
+      </HomeRowWrapper>
+    </div>
+  );
+};
+
+export const GamePageProfile = ({ playerList }) => {
+  return (
+    <div className='profile'>
+      {playerList?.map((player) => (
+        <GameRowWrapper>
+          <img src={player.picture} />
+          <div>{player.name}</div>
+          <div>HP : {player.healthPoints}</div>
+          {player.isLeader ? <AimOutlined /> : null}
+        </GameRowWrapper>
+      ))}
     </div>
   );
 };

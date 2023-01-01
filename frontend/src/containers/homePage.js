@@ -16,7 +16,7 @@ import { OptionPanel } from '../components/optionPanel';
 import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
 import { displayStatus } from '../components/info';
-import { Profile } from '../components/profile';
+import { HomePageProfile } from '../components/profile';
 const keymap = {
   ArrowUp: 'up',
   ArrowDown: 'down',
@@ -80,18 +80,14 @@ const HomePage = () => {
   } = useNetwork();
 
   //save data
+  const [requests, setRequests] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [signIn, setSignIn] = useState(false);
   const {
     location,
-    signIn,
     name,
     google,
-    requests,
-    friends,
-    roomID,
-    setSignIn,
     setGoogle,
-    setRequests,
-    setFriends,
     setLocation,
     setPlayerID,
     setRoomID,
@@ -218,12 +214,12 @@ const HomePage = () => {
   };
 
   const OnCreateRoom = () => {
-    createRoom(google.email, name);
+    createRoom(google.email, name, google.picture);
   };
 
   const OnJoinRoom = (values) => {
     const roomID = values.roomID;
-    joinRoom(google.email, name, roomID);
+    joinRoom(google.email, name, roomID, google.picture);
     setJoinRoomModalOpen(false);
   };
 
@@ -238,6 +234,7 @@ const HomePage = () => {
 
   return (
     <>
+      <SignInModal open={signIn !== true} callback={OnSignIn} />
       <ChangeNameModal
         open={changeNameModalOpen}
         onCancel={() => setChangeNameModalOpen(false)}
@@ -248,7 +245,6 @@ const HomePage = () => {
         onCancel={() => setJoinRoomModalOpen(false)}
         onJoin={OnJoinRoom}
       />
-      <SignInModal open={signIn !== true} callback={OnSignIn} />
       <FriendsModal
         open={friendsModalOpen}
         onCancel={() => setFriendsModalOpen(false)}
@@ -260,7 +256,7 @@ const HomePage = () => {
         friends={friends}
       ></FriendsModal>
       <HomePageWrapper>
-        {signIn ? <Profile src={google?.picture} name={name} /> : null}
+        {signIn ? <HomePageProfile src={google?.picture} name={name} /> : null}
         <OptionPanel options={options} selection={selection} />
       </HomePageWrapper>
     </>

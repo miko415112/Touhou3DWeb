@@ -63,7 +63,7 @@ export const Character = (props) => {
     <>
       <mesh ref={ref} visible={showBox}>
         <boxGeometry args={[1.3, 1.3, 1.3]} />
-        <meshStandardMaterial />
+        <meshBasicMaterial color={'White'} />
       </mesh>
       <Model {...props} />
     </>

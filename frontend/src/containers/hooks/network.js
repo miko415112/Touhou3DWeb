@@ -77,19 +77,21 @@ const inviteFriend = (playerID, email_to, roomID) => {
   socket.emit('Invite_Friend', data);
 };
 
-const createRoom = (email, name) => {
+const createRoom = (email, name, picture) => {
   const data = {
     email,
     name,
+    picture,
   };
   socket.emit('Create_Room', data);
 };
 
-const joinRoom = (email, name, roomID) => {
+const joinRoom = (email, name, roomID, picture) => {
   const data = {
     email,
     name,
     roomID,
+    picture,
   };
   socket.emit('Join_Room', data);
 };

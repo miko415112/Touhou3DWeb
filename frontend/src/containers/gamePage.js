@@ -10,6 +10,7 @@ import { useKeyboard } from './hooks/input';
 import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
 import { Bullets } from './bullets';
+import { GamePageProfile } from '../components/profile';
 
 const GamePageWrapper = styled.div`
   width: 1200px;
@@ -21,6 +22,16 @@ const GamePageWrapper = styled.div`
     left: 40%;
     width: 50%;
     height: 50%;
+  }
+
+  .profile {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
   }
 `;
 
@@ -37,8 +48,8 @@ const Scene = memo(() => {
   return (
     <Canvas>
       <Skybox />
-      <Ground />
       <Physics>
+        <Ground />
         <Players />
         <Bullets />
       </Physics>
@@ -47,7 +58,7 @@ const Scene = memo(() => {
 });
 
 const GamePage = () => {
-  const { leaveRoom } = useNetwork();
+  const { playerList, leaveRoom } = useNetwork();
   const { roomID, playerID, location, showBox, setShowBox, setLocation } =
     useUser();
   //switch pages
@@ -99,6 +110,7 @@ const GamePage = () => {
       {showOption ? (
         <OptionPanel options={options} selection={selection} />
       ) : null}
+      <GamePageProfile playerList={playerList} />
     </GamePageWrapper>
   );
 };
