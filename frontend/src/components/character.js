@@ -65,6 +65,10 @@ export const Character = (props) => {
         <boxGeometry args={[1.3, 1.3, 1.3]} />
         <meshBasicMaterial color={'White'} />
       </mesh>
+      <mesh ref={ref} visible={props.immune ? true : false}>
+        <sphereGeometry args={[1.5]} />
+        <meshBasicMaterial color={'#D87D68'} />
+      </mesh>
       <Model {...props} />
     </>
   );

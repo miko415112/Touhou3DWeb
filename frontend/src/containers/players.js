@@ -26,6 +26,7 @@ export const Players = () => {
             mask={0}
             group={0}
             onCollideBegin={() => {}}
+            immune={player.immune}
           />
         );
       })}

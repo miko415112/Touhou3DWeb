@@ -20,7 +20,7 @@ const GameRowWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  color: White;
+  color: ${(props) => (props.dead ? 'red' : 'white')};
   font-size: 18pt;
   gap: 20px;
 
@@ -45,10 +45,12 @@ export const GamePageProfile = ({ playerList }) => {
   return (
     <div className='profile'>
       {playerList?.map((player, index) => (
-        <GameRowWrapper key={index}>
+        <GameRowWrapper key={index} dead={player.healthPoints <= 0}>
           <img src={player.picture} />
           <div>{player.name}</div>
-          <div>HP : {player.healthPoints}</div>
+          <div>
+            {player.healthPoints <= 0 ? 'LOSE' : 'HP :' + player.healthPoints}
+          </div>
           {player.isLeader ? <AimOutlined /> : null}
         </GameRowWrapper>
       ))}

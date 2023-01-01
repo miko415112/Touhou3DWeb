@@ -115,9 +115,9 @@ export const useControl = () => {
   useEffect(() => {
     const newFireState = [];
     if (keyboardMovement.shoot1) newFireState.push('shoot1');
-    if (keyboardMovement.shoot2) newFireState.push('shoot2');
-    if (keyboardMovement.shoot3) newFireState.push('shoot3');
-    if (keyboardMovement.shoot4) newFireState.push('shoot4');
+    else if (keyboardMovement.shoot2) newFireState.push('shoot2');
+    else if (keyboardMovement.shoot3) newFireState.push('shoot3');
+    else if (keyboardMovement.shoot4) newFireState.push('shoot4');
     setFireState(newFireState);
   }, [keyboardMovement]);
 
