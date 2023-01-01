@@ -172,13 +172,13 @@ const CircleBullet = memo((props) => {
 
 const Bullet = memo((props) => {
   switch (props.type) {
-    case 'shoot1':
+    case 'shoot0':
       return <NormalBullet {...props} />;
-    case 'shoot2':
+    case 'shoot1':
       return <CircleBullet {...props} BasicBullet={LargeBullet} />;
-    case 'shoot3':
+    case 'shoot2':
       return <RandomBullet {...props} />;
-    case 'shoot4':
+    case 'shoot3':
       return <SplitBullet {...props} />;
   }
 });

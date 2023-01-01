@@ -61,14 +61,16 @@ export const Character = (props) => {
 
   return (
     <>
-      <mesh ref={ref} visible={showBox}>
-        <boxGeometry args={[1.3, 1.3, 1.3]} />
-        <meshBasicMaterial color={'White'} />
-      </mesh>
-      <mesh ref={ref} visible={props.immune ? true : false}>
-        <sphereGeometry args={[1.5]} />
-        <meshBasicMaterial color={'#D87D68'} />
-      </mesh>
+      <group ref={ref}>
+        <mesh visible={showBox}>
+          <boxGeometry args={[1.3, 1.3, 1.3]} />
+          <meshBasicMaterial color={'White'} />
+        </mesh>
+        <mesh visible={props.immune ? true : false}>
+          <sphereGeometry args={[1.5]} />
+          <meshBasicMaterial color={'#D87D68'} />
+        </mesh>
+      </group>
       <Model {...props} />
     </>
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSphere } from '@react-three/cannon';
 import { Euler, Quaternion, Vector3 } from 'three';
 import { useKeyboard, useMouse } from './input';
@@ -13,10 +13,10 @@ const keyMap = {
   KeyS: 'pitch_down',
   KeyA: 'yaw_left',
   KeyD: 'yaw_right',
-  KeyH: 'shoot1',
-  KeyJ: 'shoot2',
-  KeyK: 'shoot3',
-  KeyL: 'shoot4',
+  KeyH: 'shoot0',
+  KeyJ: 'shoot1',
+  KeyK: 'shoot2',
+  KeyL: 'shoot3',
   Space: 'move_forward',
   ShiftLeft: 'speed_up',
 };
@@ -114,10 +114,15 @@ export const useControl = () => {
 
   useEffect(() => {
     const newFireState = [];
-    if (keyboardMovement.shoot1) newFireState.push('shoot1');
-    else if (keyboardMovement.shoot2) newFireState.push('shoot2');
-    else if (keyboardMovement.shoot3) newFireState.push('shoot3');
-    else if (keyboardMovement.shoot4) newFireState.push('shoot4');
+    if (keyboardMovement.shoot0) {
+      newFireState.push('shoot0');
+    } else if (keyboardMovement.shoot1) {
+      newFireState.push('shoot1');
+    } else if (keyboardMovement.shoot2) {
+      newFireState.push('shoot2');
+    } else if (keyboardMovement.shoot3) {
+      newFireState.push('shoot3');
+    }
     setFireState(newFireState);
   }, [keyboardMovement]);
 

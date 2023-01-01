@@ -5,6 +5,20 @@ import { useNetwork } from './hooks/network';
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from './hooks/context';
 
+const fireTimeGap = [80, 400, 300, 400];
+const validateFireTime = (fireTimeArray, fireState) => {
+  const validFireState = [];
+  const curTime = Date.now();
+  for (let i = 0; i < fireState.length; i++) {
+    const shootIndex = parseInt(fireState[i].replace('shoot', ''));
+    if (curTime - fireTimeArray[shootIndex] > fireTimeGap[shootIndex]) {
+      validFireState.push(fireState[i]);
+      fireTimeArray[shootIndex] = curTime;
+    }
+  }
+  return validFireState;
+};
+
 export const LocalPlayer = () => {
   const { rigidState, fireState } = useControl();
   const { updatePlayer } = useNetwork();
@@ -12,7 +26,7 @@ export const LocalPlayer = () => {
   const { modelName, roomID, playerID } = useUser();
   const [healthPoints, setHealthPoints] = useState(3);
   const preUpdateTime = useRef(0);
-  const curTime = useRef(0);
+  const preFireTime = useRef([0, 0, 0, 0]);
   const immune = useRef(false);
 
   camera.position.copy(rigidState.cameraPos);
@@ -29,11 +43,11 @@ export const LocalPlayer = () => {
   };
 
   useEffect(() => {
-    curTime.current = Date.now();
-    if (curTime.current - preUpdateTime.current > 80) {
+    const curTime = Date.now();
+    if (curTime - preUpdateTime.current > 80) {
       updatePlayer(roomID, playerID, {
         rigidState,
-        fireState,
+        fireState: validateFireTime(preFireTime.current, fireState),
         healthPoints,
         immune: immune.current,
       });
