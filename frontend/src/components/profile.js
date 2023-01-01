@@ -44,8 +44,8 @@ export const HomePageProfile = ({ src, name }) => {
 export const GamePageProfile = ({ playerList }) => {
   return (
     <div className='profile'>
-      {playerList?.map((player) => (
-        <GameRowWrapper>
+      {playerList?.map((player, index) => (
+        <GameRowWrapper key={index}>
           <img src={player.picture} />
           <div>{player.name}</div>
           <div>HP : {player.healthPoints}</div>

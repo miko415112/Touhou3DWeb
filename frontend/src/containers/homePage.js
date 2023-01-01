@@ -82,11 +82,12 @@ const HomePage = () => {
   //save data
   const [requests, setRequests] = useState([]);
   const [friends, setFriends] = useState([]);
-  const [signIn, setSignIn] = useState(false);
   const {
+    signIn,
     location,
     name,
     google,
+    setSignIn,
     setGoogle,
     setLocation,
     setPlayerID,

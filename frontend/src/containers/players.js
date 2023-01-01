@@ -11,25 +11,24 @@ export const Players = () => {
   return (
     <>
       <LocalPlayer />
-      {playerList?.map((player, idx) =>
-        player.playerID !== playerID ? (
+      {playerList?.map((player, idx) => {
+        if (!player.rigidState) return null;
+        if (!player.rigidState.modelPos) return null;
+        if (!player.rigidState.modelEuler) return null;
+        if (player.playerID === playerID) return null;
+        return (
           <Character
             key={playerID}
             modelName={player.modelName}
-            position={new Vector3().copy(
-              player.rigidState?.modelPos
-                ? player.rigidState.modelPos
-                : [0, 0, 0]
-            )}
-            rotation={new Euler().copy(
-              player.rigidState?.modelEuler
-                ? player.rigidState.modelEuler
-                : [0, 0, 0]
-            )}
+            position={new Vector3().copy(player.rigidState.modelPos)}
+            rotation={new Euler().copy(player.rigidState.modelEuler)}
             scale={0.1}
+            mask={0}
+            group={0}
+            onCollideBegin={() => {}}
           />
-        ) : null
-      )}
+        );
+      })}
     </>
   );
 };

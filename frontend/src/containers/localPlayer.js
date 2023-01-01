@@ -36,6 +36,11 @@ export const LocalPlayer = () => {
         position={rigidState?.modelPos}
         rotation={rigidState?.modelEuler}
         scale={0.1}
+        mask={1}
+        group={1}
+        onCollideBegin={() => {
+          setHealthPoints((prev) => prev - 1);
+        }}
       />
     </>
   );

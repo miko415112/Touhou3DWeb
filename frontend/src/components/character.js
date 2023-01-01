@@ -49,9 +49,9 @@ export const Character = (props) => {
     mass: 0,
     type: 'Kinematic',
     args: [1.3, 1.3, 1.3],
-    collisionFilterMask: 2,
-    collisionFilterGroup: 1,
-    onCollideBegin: (e) => console.log(e),
+    collisionFilterMask: props.mask,
+    collisionFilterGroup: props.group,
+    onCollideBegin: props.onCollideBegin,
   }));
 
   const { showBox } = useUser();
