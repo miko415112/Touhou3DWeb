@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Manager } from 'socket.io-client';
 
-const manager = new Manager('http://localhost:4000');
+const API_ROOT =
+  process.env.NODE_ENV === 'production'
+    ? window.location.origin.replace(/^http/, 'ws')
+    : 'ws://localhost:4000';
+const manager = new Manager(API_ROOT);
 const socket = manager.socket('/');
 
 const signInGame = (email, name, picture) => {

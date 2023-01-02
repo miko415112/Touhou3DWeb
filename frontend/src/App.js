@@ -39,7 +39,11 @@ function App() {
   return (
     <div className='root'>
       <UserProvider>
-        <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>
+        <GoogleOAuthProvider
+          clientId={
+            '301310621595-m9vgf8rd7dqtlqhi0m24fprlb01j5frj.apps.googleusercontent.com'
+          }
+        >
           <RouterProvider router={router}></RouterProvider>
         </GoogleOAuthProvider>
       </UserProvider>

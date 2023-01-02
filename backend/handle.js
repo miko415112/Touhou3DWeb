@@ -7,7 +7,7 @@ let connections = 0;
 export const registerHandler = (io) => {
   handleConnection(io);
   handleBroadcast(io);
-  handleConsoleLog(io);
+  //handleConsoleLog(io);
 };
 
 const handleConnection = (io) => {
