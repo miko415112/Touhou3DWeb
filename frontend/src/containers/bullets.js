@@ -5,6 +5,12 @@ import { Vector3, Quaternion, Euler } from 'three';
 import { memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useUser } from './hooks/context';
+import {
+  getLargeBulletTexture,
+  getNormalBulletTexture,
+  getColorfulBulletTextureArray,
+  getSplitBulletTexture,
+} from '../components/resource';
 
 const getRandomInt = (max, min) => {
   min = Math.ceil(min);
@@ -15,7 +21,7 @@ const getRandomInt = (max, min) => {
 //BasicBullet
 const NormalBullet = memo((props) => {
   const radius = 0.2;
-  const speed = 12;
+  const speed = 14;
   const [ref, api] = useSphere(() => ({
     mass: 0,
     position: [props.modelPos.x, props.modelPos.y, props.modelPos.z],
@@ -28,14 +34,14 @@ const NormalBullet = memo((props) => {
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[radius]} />
-      <meshBasicMaterial color='white' />
+      <meshBasicMaterial map={getNormalBulletTexture()} />
     </mesh>
   );
 });
 
 //BasicBullet
 const LargeBullet = memo((props) => {
-  const speed = 6;
+  const speed = 8;
   const radius = 0.6;
   const [ref, api] = useSphere(() => ({
     mass: 0,
@@ -49,14 +55,15 @@ const LargeBullet = memo((props) => {
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[radius]} />
-      <meshBasicMaterial color='#D3583C' opacity={0.5} />
+      <meshBasicMaterial map={getLargeBulletTexture()} />
     </mesh>
   );
 });
 
 //BasicBullet
 const StopBullet = memo((props) => {
-  const speed = getRandomInt(12, 3);
+  const textureArray = getColorfulBulletTextureArray();
+  const speed = getRandomInt(14, 4);
   const radius = 0.2;
   const [ref, api] = useSphere(() => ({
     mass: 0,
@@ -77,15 +84,18 @@ const StopBullet = memo((props) => {
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[radius]} />
-      <meshBasicMaterial color='White' opacity={0.5} />
+      <meshBasicMaterial
+        map={textureArray[getRandomInt(textureArray.length, 0)]}
+        opacity={0.5}
+      />
     </mesh>
   );
 });
 
 //HOC Bullet
 const SplitBullet = memo((props) => {
-  const speed = 8;
-  const radius = 0.4;
+  const speed = 10;
+  const radius = 0.6;
   const [split, setSplit] = useState(false);
   const pos = useRef();
 
@@ -119,7 +129,7 @@ const SplitBullet = memo((props) => {
   ) : (
     <mesh ref={ref}>
       <sphereGeometry args={[radius]} />
-      <meshBasicMaterial color='White' opacity={0.5} />
+      <meshBasicMaterial map={getSplitBulletTexture()} opacity={0.5} />
     </mesh>
   );
 });
@@ -187,7 +197,7 @@ export const Bullets = () => {
   const [bulletList, setBulletList] = useState([]);
   const { playerList } = useNetwork();
   const { playerID } = useUser();
-  const lifeTime = 5000;
+  const lifeTimeArray = [5000, 5000, 8000, 5000];
 
   useEffect(() => {
     setBulletList((prev) => {
@@ -201,8 +211,6 @@ export const Bullets = () => {
 
         for (let j = 0; j < player.fireState?.length; j++) {
           newBulletList.push({
-            playerID: player.playerID,
-            modelName: player.modelName,
             type: player.fireState[j],
             key: Date.now(),
             group: player.playerID === playerID ? 0 : 1,
@@ -217,8 +225,9 @@ export const Bullets = () => {
 
   useFrame(() => {
     if (!bulletList) return;
-    const newBulletList = bulletList.filter(({ key }) => {
-      return Date.now() - key < lifeTime;
+    const newBulletList = bulletList.filter(({ type, key }) => {
+      const shootIndex = parseInt(type.replace('shoot', ''));
+      return Date.now() - key < lifeTimeArray[shootIndex];
     });
     setBulletList(newBulletList ? newBulletList : []);
   });

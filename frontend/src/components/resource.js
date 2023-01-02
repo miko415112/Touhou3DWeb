@@ -33,6 +33,29 @@ export const getGroundTexture = () => {
   return texture;
 };
 
+export const getLargeBulletTexture = () => {
+  const texture = textureLoader.load(require('../resource/largeBullet.png'));
+  return texture;
+};
+
+export const getNormalBulletTexture = () => {
+  const texture = textureLoader.load(require('../resource/normalBullet.png'));
+  return texture;
+};
+
+export const getSplitBulletTexture = () => {
+  const texture = textureLoader.load(require('../resource/splitBullet.png'));
+  return texture;
+};
+
+export const getColorfulBulletTextureArray = () => {
+  const red = textureLoader.load(require('../resource/redBullet.png'));
+  const purple = textureLoader.load(require('../resource/purpleBullet.png'));
+  const green = textureLoader.load(require('../resource/greenBullet.png'));
+  const yellow = textureLoader.load(require('../resource/yellowBullet.png'));
+  return [red, purple, green, yellow];
+};
+
 export const RemiliaModel = (props) => {
   const { nodes, materials } = useGLTF('/model/Remilia/Scene.gltf');
   return (

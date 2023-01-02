@@ -3,7 +3,7 @@ import { useSphere } from '@react-three/cannon';
 import { Euler, Quaternion, Vector3 } from 'three';
 import { useKeyboard, useMouse } from './input';
 
-const move_speed = 4;
+const move_speed = 6;
 const yaw_speed = 1;
 const yaw_deflection = Math.PI / 6;
 const pitch_deflection = Math.PI / 6;
@@ -18,7 +18,7 @@ const keyMap = {
   KeyK: 'shoot2',
   KeyL: 'shoot3',
   Space: 'move_forward',
-  ShiftLeft: 'speed_up',
+  ShiftLeft: 'slow_down',
 };
 
 const mouseMap = {
@@ -26,8 +26,8 @@ const mouseMap = {
 };
 
 const calcVelocity = (keyboardMovement, MouseMovement, rigidState) => {
-  const { yaw_left, yaw_right, move_forward, speed_up } = keyboardMovement;
-  const factor = speed_up ? 1.5 : 1;
+  const { yaw_left, yaw_right, move_forward, slow_down } = keyboardMovement;
+  const factor = slow_down ? 0.6 : 1;
 
   const lin_velocity = new Vector3()
     .set(0, 0, move_forward ? -1 : 0)
