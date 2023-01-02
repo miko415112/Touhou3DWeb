@@ -6,10 +6,11 @@ import {
   SanaeModel,
   MeilingModel,
 } from './resource';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Euler, Quaternion, Vector3 } from 'three';
 import { useBox } from '@react-three/cannon';
 import { useUser } from '../containers/hooks/context';
+import { getPowerTexture } from '../components/resource';
 
 export const characterList = [
   'Remilia',
@@ -20,26 +21,39 @@ export const characterList = [
   'Meiling',
 ];
 
+const Tools = memo(({ showBox, immune, dead }) => {
+  return (
+    <>
+      <mesh visible={showBox}>
+        <boxGeometry args={[1.3, 1.3, 1.3]} />
+        <meshBasicMaterial color={'White'} />
+      </mesh>
+      <mesh visible={!dead && immune ? true : false}>
+        <sphereGeometry args={[1.5]} />
+        <meshBasicMaterial color={'#D87D68'} />
+      </mesh>
+      <mesh visible={dead ? true : false}>
+        <boxGeometry args={[2.3, 2.3, 2.3]} />
+        <meshBasicMaterial map={getPowerTexture()} />
+      </mesh>
+    </>
+  );
+});
+
 const Model = (props) => {
   switch (props.modelName) {
     case 'Remilia':
       return <RemiliaModel {...props} />;
-      break;
     case 'Koishi':
       return <KoishiModel {...props} />;
-      break;
     case 'Suwako':
       return <SuwakoModel {...props} />;
-      break;
     case 'Sakuya':
       return <SakuyaModel {...props} />;
-      break;
     case 'Sanae':
       return <SanaeModel {...props} />;
-      break;
     case 'Meiling':
       return <MeilingModel {...props} />;
-      break;
   }
   return <RemiliaModel {...props} />;
 };
@@ -62,16 +76,9 @@ export const Character = (props) => {
   return (
     <>
       <group ref={ref}>
-        <mesh visible={showBox}>
-          <boxGeometry args={[1.3, 1.3, 1.3]} />
-          <meshBasicMaterial color={'White'} />
-        </mesh>
-        <mesh visible={props.immune ? true : false}>
-          <sphereGeometry args={[1.5]} />
-          <meshBasicMaterial color={'#D87D68'} />
-        </mesh>
+        <Tools showBox={showBox} immune={props.immune} dead={props.dead} />
       </group>
-      <Model {...props} />
+      {props.dead === true ? null : <Model {...props} />}
     </>
   );
 };

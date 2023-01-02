@@ -63,12 +63,16 @@ const LargeBullet = memo((props) => {
 //BasicBullet
 const StopBullet = memo((props) => {
   const textureArray = getColorfulBulletTextureArray();
-  const speed = getRandomInt(14, 4);
+  const speed = getRandomInt(15, 5);
   const radius = 0.2;
   const [ref, api] = useSphere(() => ({
     mass: 0,
     position: [props.modelPos.x, props.modelPos.y, props.modelPos.z],
-    velocity: [...new Vector3(0, 0, -speed).applyEuler(props.modelEuler)],
+    velocity: [
+      ...new Vector3(0, getRandomInt(5, -5), -speed).applyEuler(
+        props.modelEuler
+      ),
+    ],
     args: [radius],
     type: 'Kinematic',
     collisionFilterGroup: props.group,
@@ -197,7 +201,7 @@ export const Bullets = () => {
   const [bulletList, setBulletList] = useState([]);
   const { playerList } = useNetwork();
   const { playerID } = useUser();
-  const lifeTimeArray = [5000, 5000, 8000, 5000];
+  const lifeTimeArray = [5000, 5000, 12000, 5000];
 
   useEffect(() => {
     setBulletList((prev) => {

@@ -6,12 +6,15 @@ import { useState, useEffect, useRef } from 'react';
 import { useUser } from './hooks/context';
 
 const fireTimeGap = [80, 400, 300, 400];
-const validateFireTime = (fireTimeArray, fireState) => {
+const validateFireTime = (fireTimeArray, isLeader, fireState) => {
   const validFireState = [];
   const curTime = Date.now();
   for (let i = 0; i < fireState.length; i++) {
     const shootIndex = parseInt(fireState[i].replace('shoot', ''));
-    if (curTime - fireTimeArray[shootIndex] > fireTimeGap[shootIndex]) {
+    if (
+      (isLeader || shootIndex === 0) &&
+      curTime - fireTimeArray[shootIndex] > fireTimeGap[shootIndex]
+    ) {
       validFireState.push(fireState[i]);
       fireTimeArray[shootIndex] = curTime;
     }
@@ -23,8 +26,8 @@ export const LocalPlayer = () => {
   const { rigidState, fireState } = useControl();
   const { updatePlayer } = useNetwork();
   const { camera } = useThree();
-  const { modelName, roomID, playerID } = useUser();
-  const [healthPoints, setHealthPoints] = useState(3);
+  const { modelName, roomID, playerID, isLeader } = useUser();
+  const [healthPoints, setHealthPoints] = useState(4);
   const preUpdateTime = useRef(0);
   const preFireTime = useRef([0, 0, 0, 0]);
   const immune = useRef(false);
@@ -47,7 +50,10 @@ export const LocalPlayer = () => {
     if (curTime - preUpdateTime.current > 80) {
       updatePlayer(roomID, playerID, {
         rigidState,
-        fireState: validateFireTime(preFireTime.current, fireState),
+        fireState:
+          healthPoints > 0
+            ? validateFireTime(preFireTime.current, isLeader, fireState)
+            : [],
         healthPoints,
         immune: immune.current,
       });
@@ -66,6 +72,7 @@ export const LocalPlayer = () => {
         group={1}
         onCollideBegin={handleCollision}
         immune={immune.current}
+        dead={healthPoints <= 0}
       />
     </>
   );

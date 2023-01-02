@@ -34,26 +34,43 @@ export const getGroundTexture = () => {
 };
 
 export const getLargeBulletTexture = () => {
-  const texture = textureLoader.load(require('../resource/largeBullet.png'));
+  const texture = textureLoader.load(
+    require('../resource/bullet/largeBullet.png')
+  );
   return texture;
 };
 
 export const getNormalBulletTexture = () => {
-  const texture = textureLoader.load(require('../resource/normalBullet.png'));
+  const texture = textureLoader.load(
+    require('../resource/bullet/normalBullet.png')
+  );
   return texture;
 };
 
 export const getSplitBulletTexture = () => {
-  const texture = textureLoader.load(require('../resource/splitBullet.png'));
+  const texture = textureLoader.load(
+    require('../resource/bullet/splitBullet.png')
+  );
   return texture;
 };
 
 export const getColorfulBulletTextureArray = () => {
-  const red = textureLoader.load(require('../resource/redBullet.png'));
-  const purple = textureLoader.load(require('../resource/purpleBullet.png'));
-  const green = textureLoader.load(require('../resource/greenBullet.png'));
-  const yellow = textureLoader.load(require('../resource/yellowBullet.png'));
+  const red = textureLoader.load(require('../resource/bullet/redBullet.png'));
+  const purple = textureLoader.load(
+    require('../resource/bullet/purpleBullet.png')
+  );
+  const green = textureLoader.load(
+    require('../resource/bullet/greenBullet.png')
+  );
+  const yellow = textureLoader.load(
+    require('../resource/bullet/yellowBullet.png')
+  );
   return [red, purple, green, yellow];
+};
+
+export const getPowerTexture = () => {
+  const powerTexture = textureLoader.load(require('../resource/powerItem.png'));
+  return powerTexture;
 };
 
 export const RemiliaModel = (props) => {

@@ -15,11 +15,13 @@ import { GamePageProfile } from '../components/profile';
 const GamePageWrapper = styled.div`
   width: 1200px;
   height: 675px;
+  position: relative;
 
   .optionPanel {
     position: absolute;
-    top: 50%;
-    left: 40%;
+    transform: translate(-50%, -50%);
+    top: 85%;
+    left: 78%;
     width: 50%;
     height: 50%;
   }
@@ -33,6 +35,22 @@ const GamePageWrapper = styled.div`
     justify-content: flex-start;
     align-items: flex-start;
   }
+
+  .resultPanel {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 10%;
+    left: 50%;
+  }
+`;
+
+const ResultWrapper = styled.div`
+  width: fit-content;
+  height: fit-content;
+  font-family: DFPOPコン W12;
+  font-size: 60pt;
+  font-weight: bold;
+  color: #05fae7;
 `;
 
 const keymap = {
@@ -59,8 +77,15 @@ const Scene = memo(() => {
 
 const GamePage = () => {
   const { playerList, leaveRoom } = useNetwork();
-  const { roomID, playerID, location, showBox, setShowBox, setLocation } =
-    useUser();
+  const {
+    roomID,
+    playerID,
+    location,
+    isLeader,
+    showBox,
+    setShowBox,
+    setLocation,
+  } = useUser();
   //switch pages
   const navigate = useNavigate();
 
@@ -71,11 +96,32 @@ const GamePage = () => {
   const options = ['Quit Game', showBox ? 'Hide Box' : 'Show Box'];
   const movement = useKeyboard(keymap);
 
+  //result
+  const [win, setWin] = useState(false);
+  const [lose, setLose] = useState(false);
+
   useEffect(() => {
     if (location === 'game') navigate('/game', { replace: true });
     else if (location === 'room') navigate('/room', { replace: true });
     else if (location === 'home') navigate('/', { replace: true });
   }, [location]);
+
+  useEffect(() => {
+    if (!playerList) return;
+    const leader = playerList.filter((player) => player.isLeader)[0];
+    const others = playerList.filter((player) => !player.isLeader);
+    if (others.length <= 0) return;
+    const leaderDead = leader.healthPoints <= 0;
+    let AllOthersDead = true;
+    others.forEach((player) => {
+      if (player.healthPoints > 0 || player.healthPoints === undefined)
+        AllOthersDead = false;
+    });
+    if (isLeader && AllOthersDead && !win) setWin(true);
+    else if (isLeader && leaderDead && !lose) setLose(true);
+    else if (!isLeader && leaderDead && !win) setWin(true);
+    else if (!isLeader && AllOthersDead && !lose) setLose(true);
+  }, [playerList]);
 
   useEffect(() => {
     if (movement.switch) {
@@ -109,6 +155,11 @@ const GamePage = () => {
       <Scene />
       {showOption ? (
         <OptionPanel options={options} selection={selection} />
+      ) : null}
+      {win || lose ? (
+        <ResultWrapper className='resultPanel'>
+          {win ? 'YOU WIN' : 'YOU LOSE'}
+        </ResultWrapper>
       ) : null}
       <GamePageProfile playerList={playerList} />
     </GamePageWrapper>

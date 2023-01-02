@@ -79,8 +79,15 @@ const RoomPage = () => {
   const [others, setOthers] = useState();
   const [friends, setFriends] = useState([]);
   const [onlineFriends, setOnlineFriends] = useState([]);
-  const { google, location, roomID, playerID, setLocation, setModelName } =
-    useUser();
+  const {
+    google,
+    location,
+    roomID,
+    playerID,
+    setLocation,
+    setModelName,
+    setIsLeader,
+  } = useUser();
 
   //useNetwork
   const {
@@ -116,6 +123,7 @@ const RoomPage = () => {
   }, [location]);
 
   useEffect(() => {
+    if (!playerList) return;
     const newMe = playerList?.filter(
       (player) => player.playerID === playerID
     )[0];
@@ -134,6 +142,7 @@ const RoomPage = () => {
     setMe(newMe);
     setOthers(newOthers);
     setModelName(newMe?.modelName);
+    setIsLeader(newMe.isLeader === true);
   }, [playerList]);
 
   useEffect(() => {

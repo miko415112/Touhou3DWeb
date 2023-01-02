@@ -27,6 +27,7 @@ export const Players = () => {
             group={0}
             onCollideBegin={() => {}}
             immune={player.immune}
+            dead={player.healthPoints <= 0}
           />
         );
       })}
