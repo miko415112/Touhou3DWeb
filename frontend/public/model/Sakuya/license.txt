@@ -1,0 +1,11 @@
+Model Information:
+* title:	Scuffed Sakuya Fumo
+* source:	https://sketchfab.com/3d-models/scuffed-sakuya-fumo-0d83abc11bfa434a96cedeb453e308b0
+* author:	Bad Name (https://sketchfab.com/buddythedog)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Scuffed Sakuya Fumo" (https://sketchfab.com/3d-models/scuffed-sakuya-fumo-0d83abc11bfa434a96cedeb453e308b0) by Bad Name (https://sketchfab.com/buddythedog) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
