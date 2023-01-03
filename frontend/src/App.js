@@ -3,6 +3,7 @@ import { React, Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { UserProvider } from './containers/hooks/context';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { loadingGif } from './components/resource';
 
 const GamePage = lazy(() => import('./containers/gamePage'));
 const HomePage = lazy(() => import('./containers/homePage'));
@@ -12,7 +13,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <Suspense fallback={<p>loading...</p>}>
+      <Suspense fallback={<img src={loadingGif} />}>
         <HomePage />
       </Suspense>
     ),
@@ -20,7 +21,7 @@ const router = createBrowserRouter([
   {
     path: '/game',
     element: (
-      <Suspense fallback={<p>loading...</p>}>
+      <Suspense fallback={<img src={loadingGif} />}>
         <GamePage />
       </Suspense>
     ),
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
   {
     path: '/room',
     element: (
-      <Suspense fallback={<p>loading...</p>}>
+      <Suspense fallback={<img src={loadingGif} />}>
         <RoomPage />
       </Suspense>
     ),

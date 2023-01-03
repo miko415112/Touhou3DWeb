@@ -34,7 +34,7 @@ export const HomePageProfile = ({ src, name }) => {
   return (
     <div className='profile'>
       <HomeRowWrapper>
-        <img src={src} />
+        <img src={src} referrerpolicy='no-referrer' />
         <div>{name}</div>
       </HomeRowWrapper>
     </div>
@@ -46,7 +46,7 @@ export const GamePageProfile = ({ playerList }) => {
     <div className='profile'>
       {playerList?.map((player, index) => (
         <GameRowWrapper key={index} dead={player.healthPoints <= 0}>
-          <img src={player.picture} />
+          <img src={player.picture} referrerpolicy='no-referrer' />
           <div>{player.name}</div>
           <div>
             {player.healthPoints <= 0 ? 'LOSE' : 'HP :' + player.healthPoints}

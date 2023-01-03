@@ -9,7 +9,7 @@ export const Skybox = () => {
 export const Ground = () => {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -5, 0]}>
-      <circleGeometry attach='geometry' args={[200]} />
+      <planeGeometry attach='geometry' args={[26, 16]} />
       <meshBasicMaterial attach='material' map={getGroundTexture()} />
     </mesh>
   );

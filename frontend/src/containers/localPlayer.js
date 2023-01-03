@@ -4,8 +4,14 @@ import { useThree } from '@react-three/fiber';
 import { useNetwork } from './hooks/network';
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from './hooks/context';
+import { Vector3 } from 'three';
 
 const fireTimeGap = [80, 400, 300, 400];
+const leaderPosConstrains = [new Vector3(-13, -3, -8), new Vector3(-3, 6, 8)];
+const leaderSpawnPos = new Vector3(-5, 0, 0);
+const othersPosConstrains = [new Vector3(3, -3, -8), new Vector3(13, 10, 8)];
+const othersSpawnPos = new Vector3(5, 0, 0);
+
 const validateFireTime = (fireTimeArray, isLeader, fireState) => {
   const validFireState = [];
   const curTime = Date.now();
@@ -23,10 +29,12 @@ const validateFireTime = (fireTimeArray, isLeader, fireState) => {
 };
 
 export const LocalPlayer = () => {
-  const { rigidState, fireState } = useControl();
+  const { modelName, roomID, playerID, isLeader } = useUser();
+  const spawnPos = isLeader ? leaderSpawnPos : othersSpawnPos;
+  const posConstrains = isLeader ? leaderPosConstrains : othersPosConstrains;
+  const { rigidState, fireState } = useControl(spawnPos, posConstrains);
   const { updatePlayer } = useNetwork();
   const { camera } = useThree();
-  const { modelName, roomID, playerID, isLeader } = useUser();
   const [healthPoints, setHealthPoints] = useState(4);
   const preUpdateTime = useRef(0);
   const preFireTime = useRef([0, 0, 0, 0]);

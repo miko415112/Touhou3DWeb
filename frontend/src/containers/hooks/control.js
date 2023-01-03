@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSphere } from '@react-three/cannon';
-import { Euler, Quaternion, Vector3 } from 'three';
+import { Euler, MaxEquation, Quaternion, Vector3 } from 'three';
 import { useKeyboard, useMouse } from './input';
 
-const move_speed = 6;
-const yaw_speed = 1;
-const yaw_deflection = Math.PI / 6;
-const pitch_deflection = Math.PI / 6;
+const move_speed = 4;
+const yaw_speed = 1.5;
+const yaw_deflection = Math.PI / 5;
 
 const keyMap = {
   KeyW: 'pitch_up',
@@ -21,16 +20,47 @@ const keyMap = {
   ShiftLeft: 'slow_down',
 };
 
-const mouseMap = {
-  0: 'move_forward',
+const validateVelocity = (velocity, rigidState, posConstrains) => {
+  const [corner1, corner2] = posConstrains;
+  if (
+    rigidState.modelPos.x > Math.max(corner1.x, corner2.x) &&
+    velocity.lin_velocity.x > 0
+  )
+    velocity.lin_velocity.x = 0;
+  if (
+    rigidState.modelPos.x < Math.min(corner1.x, corner2.x) &&
+    velocity.lin_velocity.x < 0
+  )
+    velocity.lin_velocity.x = 0;
+  if (
+    rigidState.modelPos.y > Math.max(corner1.y, corner2.y) &&
+    velocity.lin_velocity.y > 0
+  )
+    velocity.lin_velocity.y = 0;
+  if (
+    rigidState.modelPos.y < Math.min(corner1.y, corner2.y) &&
+    velocity.lin_velocity.y < 0
+  )
+    velocity.lin_velocity.y = 0;
+  if (
+    rigidState.modelPos.z > Math.max(corner1.z, corner2.z) &&
+    velocity.lin_velocity.z > 0
+  )
+    velocity.lin_velocity.z = 0;
+  if (
+    rigidState.modelPos.z < Math.min(corner1.z, corner2.z) &&
+    velocity.lin_velocity.z < 0
+  )
+    velocity.lin_velocity.z = 0;
 };
 
-const calcVelocity = (keyboardMovement, MouseMovement, rigidState) => {
-  const { yaw_left, yaw_right, move_forward, slow_down } = keyboardMovement;
+const calcVelocity = (keyboardMovement, rigidState) => {
+  const { yaw_left, yaw_right, pitch_up, pitch_down, move_forward, slow_down } =
+    keyboardMovement;
   const factor = slow_down ? 0.6 : 1;
 
   const lin_velocity = new Vector3()
-    .set(0, 0, move_forward ? -1 : 0)
+    .set(0, pitch_up ? 1 : pitch_down ? -1 : 0, move_forward ? -1 : 0)
     .normalize()
     .multiplyScalar(move_speed * factor)
     .applyEuler(rigidState.modelEuler);
@@ -59,7 +89,7 @@ const subscribeApi = (api, setPos, setRot) => {
 };
 
 const trackSphere = (p, r, keyboardMovement, setRigidState) => {
-  const { yaw_right, yaw_left, pitch_up, pitch_down } = keyboardMovement;
+  const { yaw_right, yaw_left } = keyboardMovement;
 
   const sphereEuler = new Euler(r[0], r[1], r[2]);
   const sphereQ = new Quaternion().setFromEuler(sphereEuler);
@@ -67,12 +97,8 @@ const trackSphere = (p, r, keyboardMovement, setRigidState) => {
     new Vector3(0, 1, 0),
     yaw_deflection * (yaw_right ? -1 : yaw_left ? 1 : 0)
   );
-  const pitchQ = new Quaternion().setFromAxisAngle(
-    new Vector3(1, 0, 0),
-    pitch_deflection * (pitch_up ? 1 : pitch_down ? -1 : 0)
-  );
 
-  const modelQ = sphereQ.multiply(yawQ).multiply(pitchQ);
+  const modelQ = sphereQ.multiply(yawQ);
   const modelEuler = new Euler().setFromQuaternion(modelQ);
 
   const spherePos = new Vector3(p[0], p[1], p[2]);
@@ -86,13 +112,12 @@ const trackSphere = (p, r, keyboardMovement, setRigidState) => {
   });
 };
 
-export const useControl = () => {
+export const useControl = (spawnPos, posConstrains) => {
   const keyboardMovement = useKeyboard(keyMap);
-  const MouseMovement = useMouse(mouseMap);
   const [pos, setPos] = useState([0, 0, 0]);
   const [rot, setRot] = useState([0, 0, 0]);
   const [rigidState, setRigidState] = useState({
-    modelPos: new Vector3(0, 0, 0),
+    modelPos: spawnPos,
     modelEuler: new Euler(0, 0, 0),
     cameraPos: new Vector3(0, 0, 3),
     cameraEuler: new Euler(0, 0, 0),
@@ -103,7 +128,9 @@ export const useControl = () => {
     type: 'Dynamic',
     position: [0, 0, 0],
   }));
+
   useEffect(() => {
+    api.position.set(...spawnPos);
     const unsubscibe = subscribeApi(api, setPos, setRot);
     return unsubscibe;
   }, []);
@@ -127,7 +154,8 @@ export const useControl = () => {
   }, [keyboardMovement]);
 
   useEffect(() => {
-    const velocity = calcVelocity(keyboardMovement, MouseMovement, rigidState);
+    const velocity = calcVelocity(keyboardMovement, rigidState);
+    validateVelocity(velocity, rigidState, posConstrains);
     api.velocity.set(...velocity.lin_velocity);
     api.angularVelocity.set(...velocity.ang_velocity);
   }, [keyboardMovement, rigidState]);

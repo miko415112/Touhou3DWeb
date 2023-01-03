@@ -169,7 +169,7 @@ export const roomBackgroundImage = require('./resource/roomBackground.jpg');
 export const homeBackgroundImage = require('./resource/background.png');
 export const nameBorderImage = require('./resource/nameBorder.png');
 export const charaBorderImage = require('./resource/charaBorder.png');
-
+export const loadingGif = require('./resource/loading.gif');
 useGLTF.preload('model/Remilia/scene.gltf');
 useGLTF.preload('model/Koishi/scene.gltf');
 useGLTF.preload('model/Suwako/scene.gltf');
