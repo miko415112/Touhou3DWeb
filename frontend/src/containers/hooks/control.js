@@ -3,8 +3,8 @@ import { useSphere } from '@react-three/cannon';
 import { Euler, MaxEquation, Quaternion, Vector3 } from 'three';
 import { useKeyboard, useMouse } from './input';
 
-const move_speed = 4;
-const yaw_speed = 1.5;
+const move_speed = 3;
+const yaw_speed = 1;
 const yaw_deflection = Math.PI / 5;
 
 const keyMap = {

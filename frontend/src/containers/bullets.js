@@ -63,13 +63,13 @@ const LargeBullet = memo((props) => {
 //BasicBullet
 const StopBullet = memo((props) => {
   const textureArray = getColorfulBulletTextureArray();
-  const speed = getRandomInt(15, 5);
+  const speed = getRandomInt(13, 5);
   const radius = 0.2;
   const [ref, api] = useSphere(() => ({
     mass: 0,
     position: [props.modelPos.x, props.modelPos.y, props.modelPos.z],
     velocity: [
-      ...new Vector3(0, getRandomInt(5, -5), -speed).applyEuler(
+      ...new Vector3(0, getRandomInt(2, -2), -speed).applyEuler(
         props.modelEuler
       ),
     ],
@@ -139,7 +139,7 @@ const SplitBullet = memo((props) => {
 
 //HOC Bullet
 const RandomBullet = memo((props) => {
-  const sectorNum = 5;
+  const sectorNum = 10;
   const sectorAngle = Math.PI / 2;
   const list = [];
 
@@ -200,7 +200,7 @@ export const Bullets = () => {
   const [bulletList, setBulletList] = useState([]);
   const { playerList } = useNetwork();
   const { playerID } = useUser();
-  const lifeTimeArray = [5000, 5000, 12000, 5000];
+  const lifeTimeArray = [4500, 4500, 12000, 4500];
 
   useEffect(() => {
     setBulletList((prev) => {

@@ -470,7 +470,7 @@ const handleBroadcast = (io) => {
       };
       io.to(roomID).emit('Room_Info', payload);
     });
-  }, 60);
+  }, 80);
   console.log('start broadcasting');
 };
 

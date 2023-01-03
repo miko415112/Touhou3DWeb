@@ -6,16 +6,17 @@ import { useState, useEffect, useRef } from 'react';
 import { useUser } from './hooks/context';
 import { Vector3 } from 'three';
 import {
+  deadAudio,
   shoot0Audio,
   shoot1Audio,
   shoot2Audio,
   shoot3Audio,
 } from '../components/resource';
 
-const fireTimeGap = [200, 1300, 1300, 1300];
-const leaderPosConstrains = [new Vector3(-13, 0, -8), new Vector3(-3, 8, 8)];
+const fireTimeGap = [120, 1800, 2200, 1800];
+const leaderPosConstrains = [new Vector3(-13, 0, -6), new Vector3(-3, 4.5, 6)];
 const leaderSpawnPos = new Vector3(-5, 1, 0);
-const othersPosConstrains = [new Vector3(3, 0, -8), new Vector3(13, 8, 8)];
+const othersPosConstrains = [new Vector3(3, 0, -6), new Vector3(13, 4.5, 6)];
 const othersSpawnPos = new Vector3(5, 1, 0);
 
 const validateFireState = (
@@ -65,6 +66,10 @@ export const LocalPlayer = () => {
       }, 3000);
     }
   };
+
+  useEffect(() => {
+    if (healthPoints == 0) deadAudio.play();
+  }, [healthPoints]);
 
   const handleAudio = (validFireState) => {
     for (let i = 0; i < validFireState.length; i++) {

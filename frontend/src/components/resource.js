@@ -174,6 +174,7 @@ export const loadingGif = require('./resource/loading.gif');
 export const changeAudio = new Audio(
   require('./resource/sound/se_select00.wav')
 );
+export const deadAudio = new Audio(require('./resource/sound/se_pldead00.wav'));
 export const selectAudio = new Audio(require('./resource/sound/ok00.wav'));
 export const shoot0Audio = new Audio(require('./resource/sound/se_tan01.wav'));
 export const shoot1Audio = new Audio(require('./resource/sound/se_option.wav'));
