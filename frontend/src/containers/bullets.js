@@ -81,7 +81,6 @@ const StopBullet = memo((props) => {
   useEffect(() => {
     setTimeout(() => {
       api.velocity.set(...new Vector3(0, 0, 0));
-      api.position.set(api.position);
     }, 2000);
   }, []);
 

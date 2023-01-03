@@ -14,6 +14,7 @@ import { useUser } from './hooks/context';
 import { displayRoomID, displayStatus } from '../components/info';
 import { useNetwork } from './hooks/network';
 import { InviteModal } from '../components/modal';
+import { changeAudio, selectAudio } from '../components/resource';
 
 const keymap = {
   ArrowUp: 'up',
@@ -68,7 +69,6 @@ const RoomPage = () => {
   const optionNumber = 5;
   const textOptions = ['Start', 'Quit', 'Invite', 'RoomID'];
   const movement = useKeyboard(keymap);
-
   //control modal
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
@@ -190,6 +190,9 @@ const RoomPage = () => {
           setSelection(0);
           break;
       }
+      selectAudio.play();
+    } else {
+      changeAudio.play();
     }
   }, [movement]);
 

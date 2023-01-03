@@ -17,6 +17,8 @@ import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
 import { displayStatus } from '../components/info';
 import { HomePageProfile } from '../components/profile';
+import { changeAudio, selectAudio } from '../components/resource';
+
 const keymap = {
   ArrowUp: 'up',
   ArrowDown: 'down',
@@ -110,6 +112,7 @@ const HomePage = () => {
     if (newSelection >= optionNumber) newSelection = 0;
     if (newSelection <= -1) newSelection = newSelection + optionNumber;
     setSelection(newSelection);
+
     if (movement.select) {
       switch (selection) {
         case 0:
@@ -129,6 +132,9 @@ const HomePage = () => {
           OnLogOut();
           break;
       }
+      selectAudio.play();
+    } else {
+      changeAudio.play();
     }
   }, [movement]);
 

@@ -170,6 +170,16 @@ export const homeBackgroundImage = require('./resource/background.png');
 export const nameBorderImage = require('./resource/nameBorder.png');
 export const charaBorderImage = require('./resource/charaBorder.png');
 export const loadingGif = require('./resource/loading.gif');
+
+export const changeAudio = new Audio(
+  require('./resource/sound/se_select00.wav')
+);
+export const selectAudio = new Audio(require('./resource/sound/ok00.wav'));
+export const shoot0Audio = new Audio(require('./resource/sound/se_tan01.wav'));
+export const shoot1Audio = new Audio(require('./resource/sound/se_option.wav'));
+export const shoot2Audio = new Audio(require('./resource/sound/kira00.wav'));
+export const shoot3Audio = new Audio(require('./resource/sound/se_tan02.wav'));
+
 useGLTF.preload('model/Remilia/scene.gltf');
 useGLTF.preload('model/Koishi/scene.gltf');
 useGLTF.preload('model/Suwako/scene.gltf');

@@ -4,13 +4,15 @@ import { Physics } from '@react-three/cannon';
 import { Players } from './players';
 import styled from 'styled-components';
 import { OptionPanel } from '../components/optionPanel';
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { useKeyboard } from './hooks/input';
 import { useNetwork } from './hooks/network';
 import { useUser } from './hooks/context';
 import { Bullets } from './bullets';
 import { GamePageProfile } from '../components/profile';
+import { changeAudio, selectAudio } from '../components/resource';
 
 const GamePageWrapper = styled.div`
   width: 1200px;
@@ -95,7 +97,6 @@ const GamePage = () => {
   const optionNumber = 2;
   const options = ['Quit Game', showBox ? 'Hide Box' : 'Show Box'];
   const movement = useKeyboard(keymap);
-
   //result
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
@@ -147,6 +148,9 @@ const GamePage = () => {
           setShowBox((prev) => !prev);
           break;
       }
+      selectAudio.play();
+    } else {
+      changeAudio.play();
     }
   }, [movement]);
 

@@ -5,24 +5,37 @@ import { useNetwork } from './hooks/network';
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from './hooks/context';
 import { Vector3 } from 'three';
+import {
+  shoot0Audio,
+  shoot1Audio,
+  shoot2Audio,
+  shoot3Audio,
+} from '../components/resource';
 
-const fireTimeGap = [80, 400, 300, 400];
-const leaderPosConstrains = [new Vector3(-13, -3, -8), new Vector3(-3, 6, 8)];
-const leaderSpawnPos = new Vector3(-5, 0, 0);
-const othersPosConstrains = [new Vector3(3, -3, -8), new Vector3(13, 10, 8)];
-const othersSpawnPos = new Vector3(5, 0, 0);
+const fireTimeGap = [200, 1300, 1300, 1300];
+const leaderPosConstrains = [new Vector3(-13, 0, -8), new Vector3(-3, 8, 8)];
+const leaderSpawnPos = new Vector3(-5, 1, 0);
+const othersPosConstrains = [new Vector3(3, 0, -8), new Vector3(13, 8, 8)];
+const othersSpawnPos = new Vector3(5, 1, 0);
 
-const validateFireTime = (fireTimeArray, isLeader, fireState) => {
+const validateFireState = (
+  fireTimeArray,
+  isLeader,
+  healthPoints,
+  fireState
+) => {
   const validFireState = [];
-  const curTime = Date.now();
-  for (let i = 0; i < fireState.length; i++) {
-    const shootIndex = parseInt(fireState[i].replace('shoot', ''));
-    if (
-      (isLeader || shootIndex === 0) &&
-      curTime - fireTimeArray[shootIndex] > fireTimeGap[shootIndex]
-    ) {
-      validFireState.push(fireState[i]);
-      fireTimeArray[shootIndex] = curTime;
+  if (healthPoints > 0) {
+    const curTime = Date.now();
+    for (let i = 0; i < fireState.length; i++) {
+      const shootIndex = parseInt(fireState[i].replace('shoot', ''));
+      if (
+        (isLeader || shootIndex === 0) &&
+        curTime - fireTimeArray[shootIndex] > fireTimeGap[shootIndex]
+      ) {
+        validFireState.push(fireState[i]);
+        fireTimeArray[shootIndex] = curTime;
+      }
     }
   }
   return validFireState;
@@ -53,19 +66,42 @@ export const LocalPlayer = () => {
     }
   };
 
+  const handleAudio = (validFireState) => {
+    for (let i = 0; i < validFireState.length; i++) {
+      switch (validFireState[i]) {
+        case 'shoot0':
+          shoot0Audio.play();
+          break;
+        case 'shoot1':
+          shoot1Audio.play();
+          break;
+        case 'shoot2':
+          shoot2Audio.play();
+          break;
+        case 'shoot3':
+          shoot3Audio.play();
+          break;
+      }
+    }
+  };
+
   useEffect(() => {
     const curTime = Date.now();
     if (curTime - preUpdateTime.current > 80) {
+      const validFireState = validateFireState(
+        preFireTime.current,
+        isLeader,
+        healthPoints,
+        fireState
+      );
       updatePlayer(roomID, playerID, {
         rigidState,
-        fireState:
-          healthPoints > 0
-            ? validateFireTime(preFireTime.current, isLeader, fireState)
-            : [],
+        fireState: validFireState,
         healthPoints,
         immune: immune.current,
       });
       preUpdateTime.current = Date.now();
+      handleAudio(validFireState);
     }
   }, [rigidState, fireState, healthPoints]);
 
