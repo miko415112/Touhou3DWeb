@@ -1,0 +1,81 @@
+列出資料夾 PATH
+磁碟區序號為 DAF0-CC0C
+C:.
+│  App.css
+│  App.js
+│  App.test.js
+│  index.css
+│  index.js
+│  logo.svg
+│  reportWebVitals.js
+│  setupTests.js
+│  tree.txt
+│  
+├─components
+│  │  character.js
+│  │  environment.js
+│  │  info.js
+│  │  modal.js
+│  │  optionPanel.js
+│  │  playerCard.js
+│  │  profile.js
+│  │  resource.js
+│  │  
+│  └─resource
+│      │  background.png
+│      │  charaBorder.png
+│      │  dirt.jpg
+│      │  loading.gif
+│      │  nameBorder.png
+│      │  powerItem.png
+│      │  roomBackground.jpg
+│      │  
+│      ├─bullet
+│      │      greenBullet.png
+│      │      largeBullet.png
+│      │      normalBullet.png
+│      │      purpleBullet.png
+│      │      redBullet.png
+│      │      splitBullet.png
+│      │      yellowBullet.png
+│      │      
+│      ├─license
+│      │      license.txt
+│      │      
+│      ├─skybox
+│      │      corona_bk.png
+│      │      corona_dn.png
+│      │      corona_ft.png
+│      │      corona_lf.png
+│      │      corona_rt.png
+│      │      corona_up.png
+│      │      redeclipse_bk.png
+│      │      redeclipse_dn.png
+│      │      redeclipse_ft.png
+│      │      redeclipse_lf.png
+│      │      redeclipse_rt.png
+│      │      redeclipse_up.png
+│      │      
+│      └─sound
+│              kira00.wav
+│              ok00.wav
+│              se_option.wav
+│              se_pldead00.wav
+│              se_select00.wav
+│              se_tan01.wav
+│              se_tan02.wav
+│              
+└─containers
+    │  bullets.js
+    │  gamePage.js
+    │  homePage.js
+    │  localPlayer.js
+    │  players.js
+    │  roomPage.js
+    │  
+    └─hooks
+            context.js
+            control.js
+            input.js
+            network.js
+            
