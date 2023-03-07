@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv-defaults';
+import mongoose from "mongoose";
+import dotenv from "dotenv-defaults";
 export default {
-  connect: () => {
+  connect: (onSuccess) => {
     dotenv.config();
     if (!process.env.MONGO_URL) {
-      console.error('Missing MONGO_URL!!!');
+      console.error("Missing MONGO_URL!!!");
       process.exit(1);
     }
     mongoose
@@ -12,10 +12,11 @@ export default {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       })
-      .then((res) => console.log('mongo db connection created'));
+      .then((res) => console.log("mongo db connection created"));
     mongoose.connection.on(
-      'error',
-      console.error.bind(console, 'connection error:')
+      "error",
+      console.error.bind(console, "connection error:")
     );
+    mongoose.connection.once("open", onSuccess);
   },
 };
