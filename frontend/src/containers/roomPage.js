@@ -1,27 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { useNavigate } from 'react-router-dom';
-import { View } from '@react-three/drei';
-import styled from 'styled-components';
-import { Physics } from '@react-three/cannon';
+import { useState, useEffect, useRef } from "react";
+import { Canvas } from "@react-three/fiber";
+import { useNavigate } from "react-router-dom";
+import { View } from "@react-three/drei";
+import styled from "styled-components";
+import { Physics } from "@react-three/cannon";
 
-import { roomBackgroundImage } from '../components/resource';
-import { RotationCharacter, characterList } from '../components/character';
-import { PlayerCard } from '../components/playerCard';
-import { useKeyboard } from './hooks/input';
-import { OptionPanel } from '../components/optionPanel';
-import { useUser } from './hooks/context';
-import { displayRoomID, displayStatus } from '../components/info';
-import { useNetwork } from './hooks/network';
-import { InviteModal } from '../components/modal';
-import { changeAudio, selectAudio } from '../components/resource';
+import { roomBackgroundImage } from "../components/resource";
+import { RotationCharacter, characterList } from "../components/character";
+import { PlayerCard } from "../components/playerCard";
+import { useKeyboard } from "./hooks/input";
+import { OptionPanel } from "../components/optionPanel";
+import { useUser } from "./hooks/context";
+import { displayRoomID, displayStatus } from "../components/info";
+import { useNetwork } from "./hooks/network";
+import { InviteModal } from "../components/modal";
+import { changeAudio, selectAudio } from "../components/resource";
 
 const keymap = {
-  ArrowUp: 'up',
-  ArrowDown: 'down',
-  ArrowRight: 'right',
-  ArrowLeft: 'left',
-  KeyZ: 'select',
+  ArrowUp: "up",
+  ArrowDown: "down",
+  ArrowRight: "right",
+  ArrowLeft: "left",
+  KeyZ: "select",
 };
 
 const RoomPageWrapper = styled.div`
@@ -67,14 +67,14 @@ const RoomPage = () => {
   //optionPanel
   const [selection, setSelection] = useState(4);
   const optionNumber = 5;
-  const textOptions = ['Start', 'Quit', 'Invite', 'RoomID'];
+  const textOptions = ["Start", "Quit", "Invite", "RoomID"];
   const movement = useKeyboard(keymap);
   //control modal
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   //save data
   const [modelIndex, setModelIndex] = useState(0);
-  const [state, setState] = useState('choosing');
+  const [state, setState] = useState("choosing");
   const [me, setMe] = useState();
   const [others, setOthers] = useState();
   const [friends, setFriends] = useState([]);
@@ -117,9 +117,9 @@ const RoomPage = () => {
   };
 
   useEffect(() => {
-    if (location === 'game') navigate('/game', { replace: true });
-    else if (location === 'room') navigate('/room', { replace: true });
-    else if (location === 'home') navigate('/', { replace: true });
+    if (location === "game") navigate("/game", { replace: true });
+    else if (location === "room") navigate("/room", { replace: true });
+    else if (location === "home") navigate("/", { replace: true });
   }, [location]);
 
   useEffect(() => {
@@ -135,7 +135,7 @@ const RoomPage = () => {
     if (newOthers?.length < 3) {
       const emptyNum = 3 - newOthers.length;
       for (let i = 1; i <= emptyNum; i++) {
-        newOthers.push({ state: 'waiting' });
+        newOthers.push({ state: "waiting" });
       }
     }
 
@@ -146,8 +146,8 @@ const RoomPage = () => {
   }, [playerList]);
 
   useEffect(() => {
-    if (roomState === 'playing') {
-      setLocation('game');
+    if (roomState === "playing") {
+      setLocation("game");
     }
   }, [roomState]);
 
@@ -166,7 +166,7 @@ const RoomPage = () => {
       if (newModelIndex >= characterList.length) newModelIndex = 0;
       if (newModelIndex <= -1) newModelIndex = characterList.length - 1;
       setModelIndex(newModelIndex);
-      setState('choosing');
+      setState("choosing");
     }
 
     if (movement.select) {
@@ -176,7 +176,7 @@ const RoomPage = () => {
           break;
         case 1:
           leaveRoom(roomID, playerID);
-          setLocation('home');
+          setLocation("home");
           break;
         case 2:
           openFriendSystem(google.email);
@@ -186,7 +186,7 @@ const RoomPage = () => {
           displayRoomID(roomID);
           break;
         case 4:
-          setState('ready');
+          setState("ready");
           setSelection(0);
           break;
       }
@@ -205,12 +205,12 @@ const RoomPage = () => {
 
   useEffect(() => {
     displayStatus(message);
-    if (message.type === 'success') {
+    if (message.type === "success") {
       switch (message.event) {
-        case 'Start_Game':
-          setLocation('game');
+        case "Start_Game":
+          setLocation("game");
           break;
-        case 'Open_FriendSystem':
+        case "Open_FriendSystem":
           setOnlineFriends(message.onlineFriends);
           setFriends(message.friends);
           break;
@@ -251,22 +251,22 @@ const RoomPage = () => {
             ))}
           </SectionWrapper>
         </PlayerSectionWrapper>
-        <Canvas eventSource={canvasRef} className='canvas'>
+        <Canvas eventSource={canvasRef} className="canvas">
           <Physics>
             {
               <View track={player0Ref}>
                 <RotationCharacter
-                  spin={me?.state === 'choosing'}
+                  spin={me?.state === "choosing"}
                   modelName={me?.modelName}
                   scale={0.23}
                 />
               </View>
             }
             {others?.map((other, index) =>
-              other.state !== 'waiting' ? (
+              other.state !== "waiting" ? (
                 <View track={playerRefArray.current[index]} key={index}>
                   <RotationCharacter
-                    spin={other.state === 'choosing'}
+                    spin={other.state === "choosing"}
                     modelName={other.modelName}
                     scale={0.23}
                   />

@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import jwt_decode from 'jwt-decode';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import jwt_decode from "jwt-decode";
 
-import { displayInvitation } from '../components/info';
-import { homeBackgroundImage } from '../components/resource';
-import { useKeyboard } from './hooks/input';
+import { displayInvitation } from "../components/info";
+import { homeBackgroundImage } from "../components/resource";
+import { useKeyboard } from "./hooks/input";
 import {
   JoinRoomModal,
   ChangeNameModal,
   SignInModal,
   FriendsModal,
-} from '../components/modal';
-import { OptionPanel } from '../components/optionPanel';
-import { useNetwork } from './hooks/network';
-import { useUser } from './hooks/context';
-import { displayStatus } from '../components/info';
-import { HomePageProfile } from '../components/profile';
-import { changeAudio, selectAudio } from '../components/resource';
+} from "../components/modal";
+import { OptionPanel } from "../components/optionPanel";
+import { useNetwork } from "./hooks/network";
+import { useUser } from "./hooks/context";
+import { displayStatus } from "../components/info";
+import { HomePageProfile } from "../components/profile";
+import { changeAudio, selectAudio } from "../components/resource";
 
 const keymap = {
-  ArrowUp: 'up',
-  ArrowDown: 'down',
-  KeyZ: 'select',
+  ArrowUp: "up",
+  ArrowDown: "down",
+  KeyZ: "select",
 };
 
 const HomePageWrapper = styled.div`
@@ -54,11 +54,11 @@ const HomePage = () => {
   const [selection, setSelection] = useState(0);
   const optionNumber = 5;
   const options = [
-    'Create Game',
-    'Join Game',
-    'Change Name',
-    'Friends',
-    'Log Out',
+    "Create Game",
+    "Join Game",
+    "Change Name",
+    "Friends",
+    "Log Out",
   ];
   //manage modals
   const [joinRoomModalOpen, setJoinRoomModalOpen] = useState(false);
@@ -98,9 +98,9 @@ const HomePage = () => {
   } = useUser();
 
   useEffect(() => {
-    if (location === 'game') navigate('/game', { replace: true });
-    else if (location === 'room') navigate('/room', { replace: true });
-    else if (location === 'home') navigate('/', { replace: true });
+    if (location === "game") navigate("/game", { replace: true });
+    else if (location === "room") navigate("/room", { replace: true });
+    else if (location === "home") navigate("/", { replace: true });
   }, [location]);
 
   useEffect(() => {
@@ -140,54 +140,54 @@ const HomePage = () => {
 
   useEffect(() => {
     displayStatus(message);
-    if (message.type === 'success') {
+    if (message.type === "success") {
       switch (message.event) {
-        case 'SignIn':
+        case "SignIn":
           setSignIn(true);
           setName(message.name);
           setRequests(message.requests);
           setFriends(message.friends);
           break;
-        case 'Change_Name':
+        case "Change_Name":
           setName(message.name);
           break;
-        case 'Open_FriendSystem':
+        case "Open_FriendSystem":
           setRequests(message.requests);
           setFriends(message.friends);
           break;
-        case 'Add_Friend':
+        case "Add_Friend":
           break;
-        case 'Accept_Friend':
+        case "Accept_Friend":
           setRequests(message.requests);
           setFriends(message.friends);
           break;
-        case 'Delete_Friend':
+        case "Delete_Friend":
           setFriends(message.friends);
           break;
-        case 'Delete_Request':
+        case "Delete_Request":
           setRequests(message.requests);
           break;
-        case 'Create_Room':
+        case "Create_Room":
           setPlayerID(message.playerID);
           setRoomID(message.roomID);
-          setLocation('room');
+          setLocation("room");
           break;
-        case 'Join_Room':
+        case "Join_Room":
           setPlayerID(message.playerID);
           setRoomID(message.roomID);
-          setLocation('room');
+          setLocation("room");
           break;
-        case 'Invite_Friend':
+        case "Invite_Friend":
           if (message.roomID !== undefined) {
             displayInvitation(message.user, () => {
               OnJoinRoom({ roomID: message.roomID });
             });
           }
           break;
-        case 'LogOut':
+        case "LogOut":
           setSignIn(false);
           setGoogle(null);
-          setName('');
+          setName("");
           break;
       }
     }
@@ -241,7 +241,6 @@ const HomePage = () => {
 
   return (
     <>
-      <SignInModal open={signIn !== true} callback={OnSignIn} />
       <ChangeNameModal
         open={changeNameModalOpen}
         onCancel={() => setChangeNameModalOpen(false)}

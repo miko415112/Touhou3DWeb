@@ -1,17 +1,17 @@
-import './App.css';
-import { React, Suspense, lazy } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { UserProvider } from './containers/hooks/context';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { loadingGif } from './components/resource';
+import "./App.css";
+import { React, Suspense, lazy } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { UserProvider } from "./containers/hooks/context";
+import { loadingGif } from "./components/resource";
 
-const GamePage = lazy(() => import('./containers/gamePage'));
-const HomePage = lazy(() => import('./containers/homePage'));
-const RoomPage = lazy(() => import('./containers/roomPage'));
+const LoginPage = lazy(() => import("./containers/loginPage"));
+const GamePage = lazy(() => import("./containers/gamePage"));
+const HomePage = lazy(() => import("./containers/homePage"));
+const RoomPage = lazy(() => import("./containers/roomPage"));
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: (
       <Suspense fallback={<img src={loadingGif} />}>
         <HomePage />
@@ -19,7 +19,15 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/game',
+    path: "/login",
+    element: (
+      <Suspense fallback={<img src={loadingGif} />}>
+        <LoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/game",
     element: (
       <Suspense fallback={<img src={loadingGif} />}>
         <GamePage />
@@ -27,7 +35,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/room',
+    path: "/room",
     element: (
       <Suspense fallback={<img src={loadingGif} />}>
         <RoomPage />
@@ -38,15 +46,9 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <div className='root'>
+    <div className="root">
       <UserProvider>
-        <GoogleOAuthProvider
-          clientId={
-            '301310621595-m9vgf8rd7dqtlqhi0m24fprlb01j5frj.apps.googleusercontent.com'
-          }
-        >
-          <RouterProvider router={router}></RouterProvider>
-        </GoogleOAuthProvider>
+        <RouterProvider router={router}></RouterProvider>
       </UserProvider>
     </div>
   );

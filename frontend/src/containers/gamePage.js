@@ -1,18 +1,18 @@
-import { Canvas } from '@react-three/fiber';
-import { Skybox, Ground } from '../components/environment';
-import { Physics } from '@react-three/cannon';
-import { Players } from './players';
-import styled from 'styled-components';
-import { OptionPanel } from '../components/optionPanel';
-import { useState, useEffect, memo } from 'react';
+import { Canvas } from "@react-three/fiber";
+import { Skybox, Ground } from "../components/environment";
+import { Physics } from "@react-three/cannon";
+import { Players } from "./players";
+import styled from "styled-components";
+import { OptionPanel } from "../components/optionPanel";
+import { useState, useEffect, memo } from "react";
 
-import { useNavigate } from 'react-router-dom';
-import { useKeyboard } from './hooks/input';
-import { useNetwork } from './hooks/network';
-import { useUser } from './hooks/context';
-import { Bullets } from './bullets';
-import { GamePageProfile } from '../components/profile';
-import { changeAudio, selectAudio } from '../components/resource';
+import { useNavigate } from "react-router-dom";
+import { useKeyboard } from "./hooks/input";
+import { useNetwork } from "./hooks/network";
+import { useUser } from "./hooks/context";
+import { Bullets } from "./bullets";
+import { GamePageProfile } from "../components/profile";
+import { changeAudio, selectAudio } from "../components/resource";
 
 const GamePageWrapper = styled.div`
   width: 1200px;
@@ -56,12 +56,12 @@ const ResultWrapper = styled.div`
 `;
 
 const keymap = {
-  ArrowUp: 'up',
-  ArrowDown: 'down',
-  ArrowRight: 'right',
-  ArrowLeft: 'left',
-  KeyZ: 'select',
-  KeyQ: 'switch',
+  ArrowUp: "up",
+  ArrowDown: "down",
+  ArrowRight: "right",
+  ArrowLeft: "left",
+  KeyZ: "select",
+  KeyQ: "switch",
 };
 
 const Scene = memo(() => {
@@ -95,16 +95,16 @@ const GamePage = () => {
   const [selection, setSelection] = useState(0);
   const [showOption, setShowOption] = useState(false);
   const optionNumber = 2;
-  const options = ['Quit Game', showBox ? 'Hide Box' : 'Show Box'];
+  const options = ["Quit Game", showBox ? "Hide Box" : "Show Box"];
   const movement = useKeyboard(keymap);
   //result
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
 
   useEffect(() => {
-    if (location === 'game') navigate('/game', { replace: true });
-    else if (location === 'room') navigate('/room', { replace: true });
-    else if (location === 'home') navigate('/', { replace: true });
+    if (location === "game") navigate("/game", { replace: true });
+    else if (location === "room") navigate("/room", { replace: true });
+    else if (location === "home") navigate("/", { replace: true });
   }, [location]);
 
   useEffect(() => {
@@ -142,7 +142,7 @@ const GamePage = () => {
       switch (selection) {
         case 0:
           leaveRoom(roomID, playerID);
-          setLocation('home');
+          setLocation("home");
           break;
         case 1:
           setShowBox((prev) => !prev);
@@ -161,8 +161,8 @@ const GamePage = () => {
         <OptionPanel options={options} selection={selection} />
       ) : null}
       {win || lose ? (
-        <ResultWrapper className='resultPanel'>
-          {win ? 'YOU WIN' : 'YOU LOSE'}
+        <ResultWrapper className="resultPanel">
+          {win ? "YOU WIN" : "YOU LOSE"}
         </ResultWrapper>
       ) : null}
       <GamePageProfile playerList={playerList} />
