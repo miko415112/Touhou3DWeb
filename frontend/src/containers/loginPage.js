@@ -1,8 +1,9 @@
 import styled from "styled-components";
-import { googleLoginImage, introImage } from "../components/resource";
-import { useNetwork } from "./hooks/network";
-import { useUser } from "./hooks/context";
 import { useNavigate } from "react-router-dom";
+import { googleLoginImage, introImage } from "../components/resource";
+import { network } from "./hooks/network";
+import { useUser } from "./hooks/context";
+import { useEffect } from "react";
 const LoginPageWrapper = styled.div`
   display: flex;
   width: 1200px;
@@ -41,26 +42,33 @@ const GoogleButtonWrapper = styled.button`
 `;
 
 const LoginPage = () => {
-  const { signInGame } = useNetwork();
-  const { setMikoToken, setSignIn } = useUser();
+  const { signIn, setSignIn, setProfile } = useUser();
   const navigate = useNavigate();
+
+  /* redirect to home page */
+
+  useEffect(() => {
+    if (signIn) navigate("/");
+  }, [signIn]);
+
   const handleLogin = async () => {
-    const url =
-      process.env.NODE_ENV == "production"
-        ? window.location.origin + "/api/oauth"
-        : "http://localhost:4000/api/oauth";
-    const popup = window.open(url, "Google Oauth2", "popup=yes");
+    /* get auth code */
+    const popup = window.open(
+      network.getOauthURL(),
+      "Google Oauth2",
+      "popup=yes"
+    );
     const timer = setInterval(async () => {
       const url = new URL(popup.location.href);
       const code = url.searchParams.get("code");
+      /* use code to signIn */
       if (code) {
-        const token = await signInGame(code);
-        setMikoToken(token);
+        const profile = await network.signInGame(code);
         setSignIn(true);
-        navigate("/", { replace: true });
+        setProfile(profile);
         popup.close();
+        clearInterval(timer);
       }
-      if (popup.closed) clearInterval(timer);
     }, 500);
   };
 

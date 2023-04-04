@@ -8,7 +8,7 @@ import { useState, useEffect, memo } from "react";
 
 import { useNavigate } from "react-router-dom";
 import { useKeyboard } from "./hooks/input";
-import { useNetwork } from "./hooks/network";
+import { network } from "./hooks/network";
 import { useUser } from "./hooks/context";
 import { Bullets } from "./bullets";
 import { GamePageProfile } from "../components/profile";
@@ -78,35 +78,28 @@ const Scene = memo(() => {
 });
 
 const GamePage = () => {
-  const { playerList, leaveRoom } = useNetwork();
-  const {
-    roomID,
-    playerID,
-    location,
-    isLeader,
-    showBox,
-    setShowBox,
-    setLocation,
-  } = useUser();
-  //switch pages
+  /* user-defined hook */
+  const { playerList, roomID } = network.useNetwork();
+  const { signIn, profile, isLeader, showBox, setShowBox } = useUser();
+  /* switch pages */
   const navigate = useNavigate();
-
-  //optionPanel
+  /* optionPanel */
   const [selection, setSelection] = useState(0);
   const [showOption, setShowOption] = useState(false);
   const optionNumber = 2;
   const options = ["Quit Game", showBox ? "Hide Box" : "Show Box"];
   const movement = useKeyboard(keymap);
-  //result
+  /* temp data */
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
 
-  useEffect(() => {
-    if (location === "game") navigate("/game", { replace: true });
-    else if (location === "room") navigate("/room", { replace: true });
-    else if (location === "home") navigate("/", { replace: true });
-  }, [location]);
+  /* redirect to login page */
 
+  useEffect(() => {
+    if (!signIn) navigate("/login");
+  }, [signIn]);
+
+  /* game logic */
   useEffect(() => {
     if (!playerList) return;
     const leader = playerList.filter((player) => player.isLeader)[0];
@@ -124,11 +117,12 @@ const GamePage = () => {
     else if (!isLeader && AllOthersDead && !lose) setLose(true);
   }, [playerList]);
 
+  /* execute option */
+
   useEffect(() => {
     if (movement.switch) {
       setShowOption((prev) => !prev);
     }
-
     if (!showOption) return;
 
     let newSelection = selection;
@@ -141,8 +135,8 @@ const GamePage = () => {
     if (movement.select) {
       switch (selection) {
         case 0:
-          leaveRoom(roomID, playerID);
-          setLocation("home");
+          network.leaveRoom(roomID, profile.email);
+          navigate("/");
           break;
         case 1:
           setShowBox((prev) => !prev);

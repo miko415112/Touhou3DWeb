@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { AimOutlined } from '@ant-design/icons';
+import styled from "styled-components";
+import { AimOutlined } from "@ant-design/icons";
 
 const HomeRowWrapper = styled.div`
   display: flex;
@@ -20,7 +20,7 @@ const GameRowWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  color: ${(props) => (props.dead ? 'red' : 'white')};
+  color: ${(props) => (props.dead ? "red" : "white")};
   font-size: 18pt;
   gap: 20px;
 
@@ -32,9 +32,9 @@ const GameRowWrapper = styled.div`
 
 export const HomePageProfile = ({ src, name }) => {
   return (
-    <div className='profile'>
+    <div className="profile">
       <HomeRowWrapper>
-        <img src={src} referrerPolicy='no-referrer' />
+        <img src={src} referrerPolicy="no-referrer" />
         <div>{name}</div>
       </HomeRowWrapper>
     </div>
@@ -43,13 +43,13 @@ export const HomePageProfile = ({ src, name }) => {
 
 export const GamePageProfile = ({ playerList }) => {
   return (
-    <div className='profile'>
+    <div className="profile">
       {playerList?.map((player, index) => (
         <GameRowWrapper key={index} dead={player.healthPoints <= 0}>
-          <img src={player.picture} referrerPolicy='no-referrer' />
+          <img src={player.picture} referrerPolicy="no-referrer" />
           <div>{player.name}</div>
           <div>
-            {player.healthPoints <= 0 ? 'LOSE' : 'HP :' + player.healthPoints}
+            {player.healthPoints <= 0 ? "LOSE" : "HP :" + player.healthPoints}
           </div>
           {player.isLeader ? <AimOutlined /> : null}
         </GameRowWrapper>

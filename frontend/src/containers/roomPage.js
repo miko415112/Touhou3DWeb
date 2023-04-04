@@ -12,7 +12,7 @@ import { useKeyboard } from "./hooks/input";
 import { OptionPanel } from "../components/optionPanel";
 import { useUser } from "./hooks/context";
 import { displayRoomID, displayStatus } from "../components/info";
-import { useNetwork } from "./hooks/network";
+import { network } from "./hooks/network";
 import { InviteModal } from "../components/modal";
 import { changeAudio, selectAudio } from "../components/resource";
 
@@ -64,72 +64,59 @@ const SectionWrapper = styled.div`
 `;
 
 const RoomPage = () => {
-  //optionPanel
+  /* optionPanel */
   const [selection, setSelection] = useState(4);
   const optionNumber = 5;
   const textOptions = ["Start", "Quit", "Invite", "RoomID"];
   const movement = useKeyboard(keymap);
-  //control modal
+  /* control modal */
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
-
-  //save data
+  /* temp data */
   const [modelIndex, setModelIndex] = useState(0);
   const [state, setState] = useState("choosing");
   const [me, setMe] = useState();
   const [others, setOthers] = useState();
   const [friends, setFriends] = useState([]);
   const [onlineFriends, setOnlineFriends] = useState([]);
-  const {
-    google,
-    location,
-    roomID,
-    playerID,
-    setLocation,
-    setModelName,
-    setIsLeader,
-  } = useUser();
-
-  //useNetwork
-  const {
-    message,
-    playerList,
-    roomState,
-    leaveRoom,
-    inviteFriend,
-    startGame,
-    updatePlayer,
-    openFriendSystem,
-  } = useNetwork();
-
-  //switch pages
+  /* user-defined hook */
+  const { signIn, profile, setModelName, setIsLeader } = useUser();
+  const { playerList, roomState, roomID, message } = network.useNetwork();
+  /* switch pages */
   const navigate = useNavigate();
 
-  //bind 3D model  to div
-  const canvasRef = useRef();
-  const player0Ref = useRef();
-  const player1Ref = useRef();
-  const player2Ref = useRef();
-  const player3Ref = useRef();
-  const playerRefArray = useRef([player1Ref, player2Ref, player3Ref]);
-
-  const OnInviteFriend = (email_to) => {
-    inviteFriend(playerID, email_to, roomID);
-  };
+  /* redirect to login page */
 
   useEffect(() => {
-    if (location === "game") navigate("/game", { replace: true });
-    else if (location === "room") navigate("/room", { replace: true });
-    else if (location === "home") navigate("/", { replace: true });
-  }, [location]);
+    if (!signIn) navigate("/login");
+  }, [signIn]);
+
+  /* redirect to game page*/
+
+  useEffect(() => {
+    if (roomState === "playing" && roomID) {
+      navigate("/game");
+    }
+  }, [roomState, roomID]);
+
+  /* update player state(waiting,choosing,read) and modelname */
+
+  useEffect(() => {
+    network.updatePlayer(roomID, profile.email, {
+      modelName: characterList[modelIndex],
+      state: state,
+    });
+  }, [modelIndex, state]);
+
+  /* obtain player states */
 
   useEffect(() => {
     if (!playerList) return;
     const newMe = playerList?.filter(
-      (player) => player.playerID === playerID
+      (player) => player.email === profile.email
     )[0];
 
     const newOthers = playerList?.filter(
-      (player) => player.playerID !== playerID
+      (player) => player.email !== profile.email
     );
 
     if (newOthers?.length < 3) {
@@ -145,78 +132,92 @@ const RoomPage = () => {
     setIsLeader(newMe.isLeader === true);
   }, [playerList]);
 
-  useEffect(() => {
-    if (roomState === "playing") {
-      setLocation("game");
-    }
-  }, [roomState]);
+  /* keep fetchDataing when inviteModalOpen is true */
 
   useEffect(() => {
-    let newSelection = selection;
-    if (movement.up) newSelection = selection - 1;
-    if (movement.down) newSelection = selection + 1;
-    if (newSelection >= optionNumber) newSelection = 0;
-    if (newSelection <= -1) newSelection = newSelection + optionNumber;
-    setSelection(newSelection);
-
-    if (newSelection === optionNumber - 1) {
-      let newModelIndex = modelIndex;
-      if (movement.right) newModelIndex++;
-      if (movement.left) newModelIndex--;
-      if (newModelIndex >= characterList.length) newModelIndex = 0;
-      if (newModelIndex <= -1) newModelIndex = characterList.length - 1;
-      setModelIndex(newModelIndex);
-      setState("choosing");
+    function fetchData() {
+      network
+        .openFriendSystem(profile.email)
+        .then(({ onlineFriends, friends }) => {
+          setOnlineFriends(onlineFriends);
+          setFriends(friends);
+        });
     }
-
-    if (movement.select) {
-      switch (selection) {
-        case 0:
-          startGame(roomID);
-          break;
-        case 1:
-          leaveRoom(roomID, playerID);
-          setLocation("home");
-          break;
-        case 2:
-          openFriendSystem(google.email);
-          setInviteModalOpen(true);
-          break;
-        case 3:
-          displayRoomID(roomID);
-          break;
-        case 4:
-          setState("ready");
-          setSelection(0);
-          break;
-      }
-      selectAudio.play();
+    if (inviteModalOpen) {
+      setInterval(fetchData, 1000);
     } else {
-      changeAudio.play();
+      clearInterval(fetchData);
     }
+  }, [inviteModalOpen]);
+
+  /* execute options */
+
+  useEffect(() => {
+    async function callback() {
+      let newSelection = selection;
+      if (movement.up) newSelection = selection - 1;
+      if (movement.down) newSelection = selection + 1;
+      if (newSelection >= optionNumber) newSelection = 0;
+      if (newSelection <= -1) newSelection = newSelection + optionNumber;
+      setSelection(newSelection);
+
+      if (newSelection === optionNumber - 1) {
+        let newModelIndex = modelIndex;
+        if (movement.right) newModelIndex++;
+        if (movement.left) newModelIndex--;
+        if (newModelIndex >= characterList.length) newModelIndex = 0;
+        if (newModelIndex <= -1) newModelIndex = characterList.length - 1;
+        setModelIndex(newModelIndex);
+        setState("choosing");
+      }
+
+      if (movement.select) {
+        switch (selection) {
+          case 0:
+            network.startGame(roomID);
+            break;
+          case 1:
+            network.leaveRoom(roomID, profile.email);
+            navigate("/");
+            break;
+          case 2:
+            setInviteModalOpen(true);
+            break;
+          case 3:
+            displayRoomID(roomID);
+            break;
+          case 4:
+            setState("ready");
+            setSelection(0);
+            break;
+        }
+        selectAudio.play();
+      } else {
+        changeAudio.play();
+      }
+    }
+    callback();
   }, [movement]);
 
-  useEffect(() => {
-    updatePlayer(roomID, playerID, {
-      modelName: characterList[modelIndex],
-      state: state,
-    });
-  }, [modelIndex, state]);
+  /* modal callback */
+
+  const OnInviteFriend = (email_to) => {
+    network.inviteFriend(profile.email, email_to, roomID);
+  };
+
+  /* socket messages */
 
   useEffect(() => {
     displayStatus(message);
-    if (message.type === "success") {
-      switch (message.event) {
-        case "Start_Game":
-          setLocation("game");
-          break;
-        case "Open_FriendSystem":
-          setOnlineFriends(message.onlineFriends);
-          setFriends(message.friends);
-          break;
-      }
-    }
   }, [message]);
+
+  /* bind 3D model  to div */
+  const canvasRef = useRef();
+  const player0Ref = useRef();
+  const player1Ref = useRef();
+  const player2Ref = useRef();
+  const player3Ref = useRef();
+  const playerRefArray = useRef([player1Ref, player2Ref, player3Ref]);
 
   return (
     <>

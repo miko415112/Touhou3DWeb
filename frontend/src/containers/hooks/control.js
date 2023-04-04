@@ -1,23 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
-import { useSphere } from '@react-three/cannon';
-import { Euler, MaxEquation, Quaternion, Vector3 } from 'three';
-import { useKeyboard, useMouse } from './input';
+import { useState, useEffect, useRef } from "react";
+import { useSphere } from "@react-three/cannon";
+import { Euler, Quaternion, Vector3 } from "three";
+import { useKeyboard, useMouse } from "./input";
+
+/* global settings */
 
 const move_speed = 3;
 const yaw_speed = 1;
 const yaw_deflection = Math.PI / 5;
 
 const keyMap = {
-  KeyW: 'pitch_up',
-  KeyS: 'pitch_down',
-  KeyA: 'yaw_left',
-  KeyD: 'yaw_right',
-  KeyH: 'shoot0',
-  KeyJ: 'shoot1',
-  KeyK: 'shoot2',
-  KeyL: 'shoot3',
-  Space: 'move_forward',
-  ShiftLeft: 'slow_down',
+  KeyW: "pitch_up",
+  KeyS: "pitch_down",
+  KeyA: "yaw_left",
+  KeyD: "yaw_right",
+  KeyH: "shoot0",
+  KeyJ: "shoot1",
+  KeyK: "shoot2",
+  KeyL: "shoot3",
+  Space: "move_forward",
+  ShiftLeft: "slow_down",
 };
 
 const validateVelocity = (velocity, rigidState, posConstrains) => {
@@ -78,6 +80,7 @@ const calcVelocity = (keyboardMovement, rigidState) => {
   return velocity;
 };
 
+/* detect changes in the state of the sphere */
 const subscribeApi = (api, setPos, setRot) => {
   const unsubscibePos = api.position.subscribe((p) => setPos(p));
   const unsubscibeRot = api.rotation.subscribe((r) => setRot(r));
@@ -88,6 +91,7 @@ const subscribeApi = (api, setPos, setRot) => {
   };
 };
 
+/* convert the state of the sphere to the character's */
 const trackSphere = (p, r, keyboardMovement, setRigidState) => {
   const { yaw_right, yaw_left } = keyboardMovement;
 
@@ -112,7 +116,10 @@ const trackSphere = (p, r, keyboardMovement, setRigidState) => {
   });
 };
 
+/* localPlayer control logic */
+
 export const useControl = (spawnPos, posConstrains) => {
+  /* user-defined hook */
   const keyboardMovement = useKeyboard(keyMap);
   const [pos, setPos] = useState([0, 0, 0]);
   const [rot, setRot] = useState([0, 0, 0]);
@@ -123,9 +130,11 @@ export const useControl = (spawnPos, posConstrains) => {
     cameraEuler: new Euler(0, 0, 0),
   });
   const [fireState, setFireState] = useState([]);
+
+  /* imitate character movement and collision detection with a spherical object */
   const [ref, api] = useSphere(() => ({
     mass: 0,
-    type: 'Dynamic',
+    type: "Dynamic",
     position: [0, 0, 0],
   }));
 
@@ -142,13 +151,13 @@ export const useControl = (spawnPos, posConstrains) => {
   useEffect(() => {
     const newFireState = [];
     if (keyboardMovement.shoot0) {
-      newFireState.push('shoot0');
+      newFireState.push("shoot0");
     } else if (keyboardMovement.shoot1) {
-      newFireState.push('shoot1');
+      newFireState.push("shoot1");
     } else if (keyboardMovement.shoot2) {
-      newFireState.push('shoot2');
+      newFireState.push("shoot2");
     } else if (keyboardMovement.shoot3) {
-      newFireState.push('shoot3');
+      newFireState.push("shoot3");
     }
     setFireState(newFireState);
   }, [keyboardMovement]);

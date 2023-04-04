@@ -1,5 +1,5 @@
-import { forwardRef } from 'react';
-import styled from 'styled-components';
+import { forwardRef } from "react";
+import styled from "styled-components";
 import {
   LoadingOutlined,
   CheckCircleOutlined,
@@ -7,9 +7,9 @@ import {
   RightSquareTwoTone,
   LeftSquareTwoTone,
   AimOutlined,
-} from '@ant-design/icons';
-import { Tag } from 'antd';
-import { nameBorderImage, charaBorderImage } from './resource';
+} from "@ant-design/icons";
+import { Tag } from "antd";
+import { nameBorderImage, charaBorderImage } from "./resource";
 
 const PlayerWrapper = styled.div`
   width: 200px;
@@ -78,19 +78,19 @@ const NameWrapper = styled.div`
 
 export const PlayerCard = forwardRef((props, ref) => {
   const { name, state, showArrow, isLeader } = props;
-  let color = '';
+  let color = "";
   let icon = null;
   switch (state) {
-    case 'choosing':
-      color = 'processing';
+    case "choosing":
+      color = "processing";
       icon = <SyncOutlined spin />;
       break;
-    case 'ready':
-      color = 'green';
+    case "ready":
+      color = "green";
       icon = <CheckCircleOutlined />;
       break;
-    case 'waiting':
-      color = 'purple';
+    case "waiting":
+      color = "purple";
       icon = <LoadingOutlined />;
       break;
   }
@@ -99,24 +99,24 @@ export const PlayerCard = forwardRef((props, ref) => {
     <PlayerWrapper>
       <NameWrapper>
         {isLeader ? (
-          <AimOutlined style={{ color: 'Yellow', fontSize: '25px' }} />
+          <AimOutlined style={{ color: "Yellow", fontSize: "25px" }} />
         ) : null}
-        <div className='name'>{name}</div>
+        <div className="name">{name}</div>
       </NameWrapper>
       <BoxWrapper>
-        <div ref={ref} className='chara'></div>
+        <div ref={ref} className="chara"></div>
         <Tag color={color} icon={icon}>
           {state}
         </Tag>
         {showArrow == true ? (
           <>
             <LeftSquareTwoTone
-              className='left_arrow'
-              style={{ fontSize: '40px' }}
+              className="left_arrow"
+              style={{ fontSize: "40px" }}
             />
             <RightSquareTwoTone
-              className='right_arrow'
-              style={{ fontSize: '40px' }}
+              className="right_arrow"
+              style={{ fontSize: "40px" }}
             />
           </>
         ) : null}

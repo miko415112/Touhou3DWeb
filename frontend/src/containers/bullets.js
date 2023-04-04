@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
-import { useSphere } from '@react-three/cannon';
-import { useNetwork } from './hooks/network';
-import { Vector3, Quaternion, Euler } from 'three';
-import { memo } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { useUser } from './hooks/context';
+import { useState, useEffect, useRef } from "react";
+import { useSphere } from "@react-three/cannon";
+import { Vector3, Quaternion, Euler } from "three";
+import { memo } from "react";
+import { useFrame } from "@react-three/fiber";
+
+import { network } from "./hooks/network";
+import { useUser } from "./hooks/context";
 import {
   getLargeBulletTexture,
   getNormalBulletTexture,
   getColorfulBulletTextureArray,
   getSplitBulletTexture,
-} from '../components/resource';
+} from "../components/resource";
 
 const getRandomInt = (max, min) => {
   min = Math.ceil(min);
@@ -18,7 +19,8 @@ const getRandomInt = (max, min) => {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-//BasicBullet
+/* BasicBullet */
+
 const NormalBullet = memo((props) => {
   const radius = 0.2;
   const speed = 14;
@@ -27,7 +29,7 @@ const NormalBullet = memo((props) => {
     position: [props.modelPos.x, props.modelPos.y, props.modelPos.z],
     velocity: [...new Vector3(0, 0, -speed).applyEuler(props.modelEuler)],
     args: [radius],
-    type: 'Kinematic',
+    type: "Kinematic",
     collisionFilterGroup: props.group,
   }));
 
@@ -39,7 +41,6 @@ const NormalBullet = memo((props) => {
   );
 });
 
-//BasicBullet
 const LargeBullet = memo((props) => {
   const speed = 8;
   const radius = 0.6;
@@ -48,7 +49,7 @@ const LargeBullet = memo((props) => {
     position: [props.modelPos.x, props.modelPos.y, props.modelPos.z],
     velocity: [...new Vector3(0, 0, -speed).applyEuler(props.modelEuler)],
     args: [radius],
-    type: 'Kinematic',
+    type: "Kinematic",
     collisionFilterGroup: props.group,
   }));
 
@@ -60,7 +61,6 @@ const LargeBullet = memo((props) => {
   );
 });
 
-//BasicBullet
 const StopBullet = memo((props) => {
   const textureArray = getColorfulBulletTextureArray();
   const speed = getRandomInt(13, 5);
@@ -74,7 +74,7 @@ const StopBullet = memo((props) => {
       ),
     ],
     args: [radius],
-    type: 'Kinematic',
+    type: "Kinematic",
     collisionFilterGroup: props.group,
   }));
 
@@ -95,7 +95,7 @@ const StopBullet = memo((props) => {
   );
 });
 
-//HOC Bullet
+/* HOC Bullet */
 const SplitBullet = memo((props) => {
   const speed = 10;
   const radius = 0.6;
@@ -107,7 +107,7 @@ const SplitBullet = memo((props) => {
     position: [props.modelPos.x, props.modelPos.y, props.modelPos.z],
     velocity: [...new Vector3(0, 0, -speed).applyEuler(props.modelEuler)],
     args: [radius],
-    type: 'Kinematic',
+    type: "Kinematic",
     collisionFilterGroup: props.group,
   }));
 
@@ -137,7 +137,6 @@ const SplitBullet = memo((props) => {
   );
 });
 
-//HOC Bullet
 const RandomBullet = memo((props) => {
   const sectorNum = 10;
   const sectorAngle = Math.PI / 2;
@@ -160,7 +159,6 @@ const RandomBullet = memo((props) => {
   return list.map((props) => <StopBullet {...props} />);
 });
 
-//HOC Bullet
 const CircleBullet = memo((props) => {
   const circleNum = 12;
   const list = [];
@@ -183,23 +181,27 @@ const CircleBullet = memo((props) => {
   return list.map((props) => <BasicBullet {...props} />);
 });
 
+/* combined bullet */
+
 const Bullet = memo((props) => {
   switch (props.type) {
-    case 'shoot0':
+    case "shoot0":
       return <NormalBullet {...props} />;
-    case 'shoot1':
+    case "shoot1":
       return <CircleBullet {...props} BasicBullet={LargeBullet} />;
-    case 'shoot2':
+    case "shoot2":
       return <RandomBullet {...props} />;
-    case 'shoot3':
+    case "shoot3":
       return <SplitBullet {...props} />;
   }
 });
 
+/* display all bullets */
+
 export const Bullets = () => {
   const [bulletList, setBulletList] = useState([]);
-  const { playerList } = useNetwork();
-  const { playerID } = useUser();
+  const { playerList } = network.useNetwork();
+  const { profile } = useUser();
   const lifeTimeArray = [4500, 4500, 12000, 4500];
 
   useEffect(() => {
@@ -216,7 +218,7 @@ export const Bullets = () => {
           newBulletList.push({
             type: player.fireState[j],
             key: Date.now(),
-            group: player.playerID === playerID ? 0 : 1,
+            group: player.email === profile.email ? 0 : 1,
             modelPos: player.rigidState.modelPos,
             modelEuler: player.rigidState.modelEuler,
           });
@@ -229,7 +231,7 @@ export const Bullets = () => {
   useFrame(() => {
     if (!bulletList) return;
     const newBulletList = bulletList.filter(({ type, key }) => {
-      const shootIndex = parseInt(type.replace('shoot', ''));
+      const shootIndex = parseInt(type.replace("shoot", ""));
       return Date.now() - key < lifeTimeArray[shootIndex];
     });
     setBulletList(newBulletList ? newBulletList : []);

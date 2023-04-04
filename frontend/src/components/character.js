@@ -1,3 +1,5 @@
+import { useState, useEffect, memo } from "react";
+import { Euler, Quaternion, Vector3 } from "three";
 import {
   RemiliaModel,
   KoishiModel,
@@ -5,32 +7,31 @@ import {
   SakuyaModel,
   SanaeModel,
   MeilingModel,
-} from './resource';
-import { useState, useEffect, memo } from 'react';
-import { Euler, Quaternion, Vector3 } from 'three';
-import { useBox } from '@react-three/cannon';
-import { useUser } from '../containers/hooks/context';
-import { getPowerTexture } from '../components/resource';
+} from "./resource";
+import { useBox } from "@react-three/cannon";
+import { useUser } from "../containers/hooks/context";
+import { getPowerTexture } from "../components/resource";
 
 export const characterList = [
-  'Remilia',
-  'Koishi',
-  'Suwako',
-  'Sakuya',
-  'Sanae',
-  'Meiling',
+  "Remilia",
+  "Koishi",
+  "Suwako",
+  "Sakuya",
+  "Sanae",
+  "Meiling",
 ];
 
+/* some effects */
 const Tools = memo(({ showBox, immune, dead }) => {
   return (
     <>
       <mesh visible={showBox}>
         <boxGeometry args={[1.3, 1.3, 1.3]} />
-        <meshBasicMaterial color={'White'} />
+        <meshBasicMaterial color={"White"} />
       </mesh>
       <mesh visible={!dead && immune ? true : false}>
         <sphereGeometry args={[1.5]} />
-        <meshBasicMaterial color={'#D87D68'} />
+        <meshBasicMaterial color={"#D87D68"} />
       </mesh>
       <mesh visible={dead ? true : false}>
         <boxGeometry args={[2.3, 2.3, 2.3]} />
@@ -42,17 +43,17 @@ const Tools = memo(({ showBox, immune, dead }) => {
 
 const Model = (props) => {
   switch (props.modelName) {
-    case 'Remilia':
+    case "Remilia":
       return <RemiliaModel {...props} />;
-    case 'Koishi':
+    case "Koishi":
       return <KoishiModel {...props} />;
-    case 'Suwako':
+    case "Suwako":
       return <SuwakoModel {...props} />;
-    case 'Sakuya':
+    case "Sakuya":
       return <SakuyaModel {...props} />;
-    case 'Sanae':
+    case "Sanae":
       return <SanaeModel {...props} />;
-    case 'Meiling':
+    case "Meiling":
       return <MeilingModel {...props} />;
   }
   return <RemiliaModel {...props} />;
@@ -61,7 +62,7 @@ const Model = (props) => {
 export const Character = (props) => {
   const [ref, api] = useBox(() => ({
     mass: 0,
-    type: 'Kinematic',
+    type: "Kinematic",
     args: [1.3, 1.3, 1.3],
     collisionFilterMask: props.mask,
     collisionFilterGroup: props.group,

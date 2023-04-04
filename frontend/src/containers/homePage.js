@@ -1,21 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import jwt_decode from "jwt-decode";
 
-import { displayInvitation } from "../components/info";
+import { network } from "./hooks/network";
 import { homeBackgroundImage } from "../components/resource";
 import { useKeyboard } from "./hooks/input";
-import {
-  JoinRoomModal,
-  ChangeNameModal,
-  SignInModal,
-  FriendsModal,
-} from "../components/modal";
+import { JoinRoomModal, FriendsModal } from "../components/modal";
 import { OptionPanel } from "../components/optionPanel";
-import { useNetwork } from "./hooks/network";
 import { useUser } from "./hooks/context";
-import { displayStatus } from "../components/info";
+import { displayStatus, displayInvitation } from "../components/info";
 import { HomePageProfile } from "../components/profile";
 import { changeAudio, selectAudio } from "../components/resource";
 
@@ -38,7 +31,7 @@ const HomePageWrapper = styled.div`
 
   .optionPanel {
     width: 50%;
-    height: 60%;
+    height: 50%;
   }
 
   .profile {
@@ -49,63 +42,54 @@ const HomePageWrapper = styled.div`
 `;
 
 const HomePage = () => {
-  //use option panel
+  /* use option panel */
   const movement = useKeyboard(keymap);
   const [selection, setSelection] = useState(0);
-  const optionNumber = 5;
-  const options = [
-    "Create Game",
-    "Join Game",
-    "Change Name",
-    "Friends",
-    "Log Out",
-  ];
-  //manage modals
+  const optionNumber = 4;
+  const options = ["Create Game", "Join Game", "Friends", "Log Out"];
+  /* manage modals */
   const [joinRoomModalOpen, setJoinRoomModalOpen] = useState(false);
-  const [changeNameModalOpen, setChangeNameModalOpen] = useState(false);
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
-  //switch pages
+  /* switch pages */
   const navigate = useNavigate();
-  //useNetwork
-  const {
-    signInGame,
-    logOutGame,
-    changeName,
-    openFriendSystem,
-    addFriend,
-    acceptFriend,
-    deleteFriend,
-    deleteRequest,
-    createRoom,
-    joinRoom,
-    message,
-  } = useNetwork();
-
-  //save data
+  /* user-defined hook */
+  const { signIn, profile, setSignIn, setProfile } = useUser();
+  const { message, roomState, roomID, invitation } = network.useNetwork();
+  /* temp data */
   const [requests, setRequests] = useState([]);
   const [friends, setFriends] = useState([]);
-  const {
-    signIn,
-    location,
-    name,
-    google,
-    setSignIn,
-    setGoogle,
-    setLocation,
-    setPlayerID,
-    setRoomID,
-    setName,
-  } = useUser();
+
+  /* redirect to login page */
 
   useEffect(() => {
-    if (location === "game") navigate("/game", { replace: true });
-    else if (location === "room") navigate("/room", { replace: true });
-    else if (location === "home") navigate("/", { replace: true });
-  }, [location]);
+    if (!signIn) navigate("/login");
+  }, [signIn]);
+
+  /* redirect to room page */
+  useEffect(() => {
+    if (roomState === "choosing" && roomID) navigate("/room");
+  }, [roomState, roomID]);
+
+  /* keep fetching data when friendsModalOpen is true */
 
   useEffect(() => {
-    if (!signIn) return;
+    function fetchData() {
+      network.openFriendSystem(profile.email).then(({ requests, friends }) => {
+        setRequests(requests);
+        setFriends(friends);
+      });
+    }
 
+    if (friendsModalOpen) {
+      setInterval(fetchData, 1000);
+    } else {
+      clearInterval(fetchData);
+    }
+  }, [friendsModalOpen]);
+
+  /* execute option */
+
+  useEffect(() => {
     let newSelection = selection;
     if (movement.up) newSelection = selection - 1;
     if (movement.down) newSelection = selection + 1;
@@ -116,20 +100,19 @@ const HomePage = () => {
     if (movement.select) {
       switch (selection) {
         case 0:
-          OnCreateRoom();
+          network.createRoom(profile.email, profile.name, profile.picture);
           break;
         case 1:
           setJoinRoomModalOpen(true);
           break;
         case 2:
-          setChangeNameModalOpen(true);
-          break;
-        case 3:
-          openFriendSystem(google.email);
           setFriendsModalOpen(true);
           break;
-        case 4:
-          OnLogOut();
+        case 3:
+          network.logOutGame();
+          setSignIn(false);
+          setProfile({});
+          navigate("/login");
           break;
       }
       selectAudio.play();
@@ -138,114 +121,65 @@ const HomePage = () => {
     }
   }, [movement]);
 
+  /* socket message */
+
   useEffect(() => {
     displayStatus(message);
-    if (message.type === "success") {
-      switch (message.event) {
-        case "SignIn":
-          setSignIn(true);
-          setName(message.name);
-          setRequests(message.requests);
-          setFriends(message.friends);
-          break;
-        case "Change_Name":
-          setName(message.name);
-          break;
-        case "Open_FriendSystem":
-          setRequests(message.requests);
-          setFriends(message.friends);
-          break;
-        case "Add_Friend":
-          break;
-        case "Accept_Friend":
-          setRequests(message.requests);
-          setFriends(message.friends);
-          break;
-        case "Delete_Friend":
-          setFriends(message.friends);
-          break;
-        case "Delete_Request":
-          setRequests(message.requests);
-          break;
-        case "Create_Room":
-          setPlayerID(message.playerID);
-          setRoomID(message.roomID);
-          setLocation("room");
-          break;
-        case "Join_Room":
-          setPlayerID(message.playerID);
-          setRoomID(message.roomID);
-          setLocation("room");
-          break;
-        case "Invite_Friend":
-          if (message.roomID !== undefined) {
-            displayInvitation(message.user, () => {
-              OnJoinRoom({ roomID: message.roomID });
-            });
-          }
-          break;
-        case "LogOut":
-          setSignIn(false);
-          setGoogle(null);
-          setName("");
-          break;
-      }
-    }
   }, [message]);
 
-  const OnSignIn = (response) => {
-    const user = jwt_decode(response.credential);
-    setGoogle(user);
-    signInGame(user.email, user.name, user.picture);
-  };
+  /* socket invitation */
 
-  const OnAddFriend = (values) => {
+  useEffect(() => {
+    if (invitation)
+      displayInvitation(invitation.user, () => {
+        network.joinRoom(
+          profile.email,
+          profile.name,
+          profile.picture,
+          invitation.roomID
+        );
+      });
+  }, [invitation]);
+
+  /* modal callback */
+
+  const OnAddFriend = async (values) => {
     const email_to = values.email;
-    const email_from = google.email;
-    addFriend(email_from, email_to);
+    const email_from = profile.email;
+    const data = await network.addFriend(email_from, email_to);
+    displayStatus({ type: "success", msg: data.msg });
   };
 
-  const OnAcceptFriend = (email_from) => {
-    const email_to = google.email;
-    acceptFriend(email_from, email_to);
+  const OnAcceptFriend = async (email_from) => {
+    const email_to = profile.email;
+    const data = await network.acceptFriend(email_from, email_to);
+    setRequests(data.requests);
+    setFriends(data.friends);
+    displayStatus({ type: "success", msg: data.msg });
   };
 
-  const OnDeleteFriend = (email_to) => {
-    const email_from = google.email;
-    deleteFriend(email_from, email_to);
+  const OnDeleteFriend = async (email_to) => {
+    const email_from = profile.email;
+    const data = await network.deleteFriend(email_from, email_to);
+    setFriends(data.friends);
+    displayStatus({ type: "success", msg: data.msg });
   };
 
-  const OnDeleteRequest = (email_to) => {
-    const email_from = google.email;
-    deleteRequest(email_from, email_to);
-  };
-
-  const OnCreateRoom = () => {
-    createRoom(google.email, name, google.picture);
+  const OnDeleteRequest = async (email_to) => {
+    const email_from = profile.email;
+    const data = await network.deleteRequest(email_from, email_to);
+    setRequests(data.requests);
+    displayStatus({ type: "success", msg: data.msg });
   };
 
   const OnJoinRoom = (values) => {
     const roomID = values.roomID;
-    joinRoom(google.email, name, roomID, google.picture);
+    network.joinRoom(profile.email, profile.name, profile.picture, roomID);
     setJoinRoomModalOpen(false);
-  };
-
-  const OnSaveName = (values) => {
-    changeName(google.email, values.name, google.picture);
-    setChangeNameModalOpen(false);
-  };
-
-  const OnLogOut = () => {
-    logOutGame(google.email);
   };
 
   return (
     <>
-      <ChangeNameModal
-        open={changeNameModalOpen}
-        onCancel={() => setChangeNameModalOpen(false)}
-        onSave={OnSaveName}
-      />
       <JoinRoomModal
         open={joinRoomModalOpen}
         onCancel={() => setJoinRoomModalOpen(false)}
@@ -262,7 +196,7 @@ const HomePage = () => {
         friends={friends}
       ></FriendsModal>
       <HomePageWrapper>
-        {signIn ? <HomePageProfile src={google?.picture} name={name} /> : null}
+        <HomePageProfile src={profile?.picture} name={profile?.name} />
         <OptionPanel options={options} selection={selection} />
       </HomePageWrapper>
     </>

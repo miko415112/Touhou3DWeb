@@ -1,170 +1,185 @@
-import { useState, useEffect } from "react";
-import { Manager } from "socket.io-client";
+import { io } from "socket.io-client";
 import axios from "axios";
+import { useState, useEffect } from "react";
 
-const API_ROOT =
+/* global settings */
+
+const ROOT =
   process.env.NODE_ENV == "production"
-    ? window.location.origin + "/api"
-    : "http://localhost:4000/api";
+    ? window.location.origin
+    : "http://localhost:4000";
 
-const SOCKET_ROOT =
-  process.env.NODE_ENV == "production"
-    ? window.location.origin.replace(/^http/, "ws")
-    : "ws://localhost:4000";
-const manager = new Manager(SOCKET_ROOT);
-const socket = manager.socket("/");
+const instance = axios.create({ baseURL: ROOT });
+const socket = io(ROOT, {
+  autoConnect: false,
+  path: "/api/socket",
+});
 
-const signInGame = async (code) => {
-  const { data } = await axios.get(API_ROOT + "/token", {
-    params: {
-      code,
-    },
-  });
-  return data;
-};
+/* utils */
+export const network = {
+  /* express endpoint */
 
-const logOutGame = (email) => {
-  const data = {
-    email,
-  };
-  socket.emit("LogOut", data);
-};
+  getOauthURL: () => {
+    return ROOT + "/auth/oauth";
+  },
 
-const openFriendSystem = (email) => {
-  const data = {
-    email,
-  };
-  socket.emit("Open_FriendSystem", data);
-};
-
-const changeName = (email, name, picture) => {
-  const data = {
-    email,
-    name,
-    picture,
-  };
-  socket.emit("Change_Name", data);
-};
-
-const addFriend = (email_from, email_to) => {
-  const data = {
-    email_from,
-    email_to,
-  };
-  socket.emit("Add_Friend", data);
-};
-
-const acceptFriend = (email_from, email_to) => {
-  const data = {
-    email_from,
-    email_to,
-  };
-  socket.emit("Accept_Friend", data);
-};
-
-const deleteFriend = (email_from, email_to) => {
-  const data = {
-    email_from,
-    email_to,
-  };
-  socket.emit("Delete_Friend", data);
-};
-
-const deleteRequest = (email_from, email_to) => {
-  const data = {
-    email_from,
-    email_to,
-  };
-  socket.emit("Delete_Request", data);
-};
-
-const inviteFriend = (playerID, email_to, roomID) => {
-  const data = {
-    playerID,
-    email_to,
-    roomID,
-  };
-  socket.emit("Invite_Friend", data);
-};
-
-const createRoom = (email, name, picture) => {
-  const data = {
-    email,
-    name,
-    picture,
-  };
-  socket.emit("Create_Room", data);
-};
-
-const joinRoom = (email, name, roomID, picture) => {
-  const data = {
-    email,
-    name,
-    roomID,
-    picture,
-  };
-  socket.emit("Join_Room", data);
-};
-
-const leaveRoom = (roomID, playerID) => {
-  const data = {
-    roomID: roomID,
-    playerID: playerID,
-  };
-  socket.emit("Leave_Room", data);
-};
-
-const startGame = (roomID) => {
-  const data = {
-    roomID: roomID,
-  };
-  socket.emit("Start_Game", data);
-};
-
-const updatePlayer = (roomID, playerID, props) => {
-  const data = {
-    roomID: roomID,
-    playerID: playerID,
-    props,
-  };
-  socket.emit("Update_Player", data);
-};
-
-export const useNetwork = () => {
-  const [playerList, setPlayerList] = useState();
-  const [roomState, setRoomState] = useState();
-  const [message, setMessage] = useState({});
-
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("connected");
+  signInGame: async (code) => {
+    const { data } = await instance.get("/auth/token", {
+      params: {
+        code,
+      },
     });
-    socket.on("Message", (msg) => {
-      setMessage(msg);
-    });
-    socket.on("Room_Info", (room) => {
-      setPlayerList(room.playerList);
-      setRoomState(room.state);
-    });
-  }, []);
+    const { mikoToken, profile } = data;
+    /* setCredentials */
+    instance.defaults.headers.common.Authorization = mikoToken;
+    socket.auth = {
+      token: mikoToken,
+    };
 
-  return {
-    updatePlayer,
-    signInGame,
-    logOutGame,
-    changeName,
-    openFriendSystem,
-    addFriend,
-    acceptFriend,
-    deleteFriend,
-    deleteRequest,
-    inviteFriend,
-    createRoom,
-    joinRoom,
-    leaveRoom,
-    startGame,
-    message,
-    playerList,
-    roomState,
-  };
+    socket.connect();
+    return profile;
+  },
+
+  logOutGame: () => {
+    socket.disconnect();
+  },
+
+  openFriendSystem: async (email) => {
+    const { data } = await instance.get("/api/friend", {
+      params: {
+        email,
+      },
+    });
+    return data;
+  },
+
+  addFriend: async (email_from, email_to) => {
+    const { data } = await instance.post("/api/friend", {
+      action: "add",
+      email_from,
+      email_to,
+    });
+    return data;
+  },
+
+  acceptFriend: async (email_from, email_to) => {
+    const { data } = await instance.post("/api/friend", {
+      action: "accept",
+      email_from,
+      email_to,
+    });
+    return data;
+  },
+
+  deleteFriend: async (email_from, email_to) => {
+    const { data } = await instance.post("/api/friend", {
+      action: "delete",
+      email_from,
+      email_to,
+    });
+    return data;
+  },
+
+  deleteRequest: async (email_from, email_to) => {
+    const { data } = await instance.post("/api/friend", {
+      action: "reject",
+      email_from,
+      email_to,
+    });
+    return data;
+  },
+
+  /* socket event */
+
+  inviteFriend: (email_from, email_to, roomID) => {
+    const data = {
+      email_from,
+      email_to,
+      roomID,
+    };
+    socket.emit("Invite_Friend", data);
+  },
+
+  createRoom: (email, name, picture) => {
+    const data = {
+      email,
+      name,
+      picture,
+    };
+    socket.emit("Create_Room", data);
+  },
+
+  joinRoom: (email, name, picture, roomID) => {
+    const data = {
+      email,
+      name,
+      picture,
+      roomID,
+    };
+    socket.emit("Join_Room", data);
+  },
+
+  leaveRoom: (roomID, email) => {
+    const data = {
+      roomID,
+      email,
+    };
+    socket.emit("Leave_Room", data);
+  },
+
+  startGame: (roomID) => {
+    const data = {
+      roomID: roomID,
+    };
+    socket.emit("Start_Game", data);
+  },
+
+  updatePlayer: (roomID, email, props) => {
+    const data = {
+      roomID,
+      email,
+      props,
+    };
+    socket.emit("Update_Player", data);
+  },
+
+  useNetwork: () => {
+    const [playerList, setPlayerList] = useState();
+    const [roomState, setRoomState] = useState();
+    const [roomID, setRoomID] = useState();
+    const [invitation, setInvitation] = useState();
+    const [message, setMessage] = useState({});
+
+    useEffect(() => {
+      function handleMessage(msg) {
+        setMessage(msg);
+      }
+
+      function handleRoomInfo(room) {
+        setPlayerList(room.playerList);
+        setRoomState(room.roomState);
+        setRoomID(room.roomID);
+      }
+
+      function handleInvitation(invitation) {
+        setInvitation(invitation);
+      }
+      socket.on("Message", handleMessage);
+      socket.on("RoomInfo", handleRoomInfo);
+      socket.on("Invitation", handleInvitation);
+      return () => {
+        socket.off(handleMessage);
+        socket.off(handleRoomInfo);
+        socket.off(handleInvitation);
+      };
+    }, []);
+
+    return {
+      playerList,
+      roomState,
+      roomID,
+      invitation,
+      message,
+    };
+  },
 };

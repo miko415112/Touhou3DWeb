@@ -1,12 +1,15 @@
-import { Character } from '../components/character';
-import { useNetwork } from './hooks/network';
-import { Euler, Vector3 } from 'three';
-import { useUser } from './hooks/context';
-import { LocalPlayer } from './localPlayer';
+import { Euler, Vector3 } from "three";
 
+import { Character } from "../components/character";
+import { network } from "./hooks/network";
+import { useUser } from "./hooks/context";
+import { LocalPlayer } from "./localPlayer";
+
+/* display all players except myself */
 export const Players = () => {
-  const { playerList } = useNetwork();
-  const { playerID } = useUser();
+  /* user-defined hook */
+  const { playerList } = network.useNetwork();
+  const { profile } = useUser();
 
   return (
     <>
@@ -15,10 +18,10 @@ export const Players = () => {
         if (!player.rigidState) return null;
         if (!player.rigidState.modelPos) return null;
         if (!player.rigidState.modelEuler) return null;
-        if (player.playerID === playerID) return null;
+        if (player.email === profile.email) return null;
         return (
           <Character
-            key={playerID}
+            key={profile}
             modelName={player.modelName}
             position={new Vector3().copy(player.rigidState.modelPos)}
             rotation={new Euler().copy(player.rigidState.modelEuler)}
