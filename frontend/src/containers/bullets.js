@@ -21,7 +21,7 @@ const getRandomInt = (max, min) => {
 
 /* BasicBullet */
 
-const NormalBullet = memo((props) => {
+const NormalBullet = (props) => {
   const radius = 0.2;
   const speed = 14;
   const [ref, api] = useSphere(() => ({
@@ -39,9 +39,9 @@ const NormalBullet = memo((props) => {
       <meshBasicMaterial map={getNormalBulletTexture()} />
     </mesh>
   );
-});
+};
 
-const LargeBullet = memo((props) => {
+const LargeBullet = (props) => {
   const speed = 8;
   const radius = 0.6;
   const [ref, api] = useSphere(() => ({
@@ -59,9 +59,9 @@ const LargeBullet = memo((props) => {
       <meshBasicMaterial map={getLargeBulletTexture()} />
     </mesh>
   );
-});
+};
 
-const StopBullet = memo((props) => {
+const StopBullet = (props) => {
   const textureArray = getColorfulBulletTextureArray();
   const speed = getRandomInt(13, 5);
   const radius = 0.2;
@@ -93,10 +93,10 @@ const StopBullet = memo((props) => {
       />
     </mesh>
   );
-});
+};
 
 /* HOC Bullet */
-const SplitBullet = memo((props) => {
+const SplitBullet = (props) => {
   const speed = 10;
   const radius = 0.6;
   const [split, setSplit] = useState(false);
@@ -135,7 +135,7 @@ const SplitBullet = memo((props) => {
       <meshBasicMaterial map={getSplitBulletTexture()} opacity={0.5} />
     </mesh>
   );
-});
+};
 
 const RandomBullet = memo((props) => {
   const sectorNum = 10;

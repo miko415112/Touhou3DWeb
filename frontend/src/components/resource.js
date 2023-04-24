@@ -10,6 +10,20 @@ import { useGLTF } from "@react-three/drei";
 const cubeTextureLoader = new CubeTextureLoader();
 const textureLoader = new TextureLoader();
 
+export const getShieldTexture = () => {
+  const texture = textureLoader.load(require("./resource/shield.jpg"));
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  return texture;
+};
+
+export const getColumnTexture = () => {
+  const texture = textureLoader.load(require("./resource/kekkai.png"));
+  texture.wrapS = texture.wrapT = RepeatWrapping;
+  texture.repeat.set(2, 1);
+  return texture;
+};
+
 export const getSkyboxTextureArray = () => {
   const textureArray = cubeTextureLoader.load([
     require("./resource/skybox/corona_ft.png"),
@@ -25,11 +39,17 @@ export const getSkyboxTextureArray = () => {
   return textureArray;
 };
 
-export const getGroundTexture = () => {
+export const getDirtTexture = () => {
   const texture = textureLoader.load(require("./resource/dirt.jpg"));
   texture.wrapS = RepeatWrapping;
   texture.wrapT = RepeatWrapping;
-  texture.repeat.set(100, 100);
+  return texture;
+};
+
+export const getGrassTexture = () => {
+  const texture = textureLoader.load(require("./resource/grass.jpg"));
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
   return texture;
 };
 

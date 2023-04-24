@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Euler, Quaternion, Vector3 } from "three";
 import {
   RemiliaModel,
@@ -9,8 +9,7 @@ import {
   MeilingModel,
 } from "./resource";
 import { useBox } from "@react-three/cannon";
-import { useUser } from "../containers/hooks/context";
-import { getPowerTexture } from "../components/resource";
+import { getPowerTexture, getShieldTexture } from "../components/resource";
 
 export const characterList = [
   "Remilia",
@@ -21,25 +20,74 @@ export const characterList = [
   "Meiling",
 ];
 
-/* some effects */
-const Tools = memo(({ showBox, immune, dead }) => {
+export const Shield = (props) => {
+  const [texture, setTexture] = useState(getShieldTexture());
+  const customShaderMaterial = useRef({
+    transparent: true,
+    uniforms: {
+      u_texture: { value: texture },
+      u_time: { value: 0 },
+    },
+    vertexShader: `
+        
+        precision highp float;
+        varying vec2 vUv;
+        varying vec4 mvPosition;
+        varying vec4 mvNormal;
+  
+        void main() {
+            vUv = uv;
+            mvPosition = modelViewMatrix *vec4(position, 1.);
+            mvNormal = modelViewMatrix * vec4(normal, 0.);
+            gl_Position =  projectionMatrix * modelViewMatrix * vec4(position, 1.);
+        }
+      `,
+    fragmentShader: `
+        precision highp float;
+        uniform sampler2D u_texture;
+        uniform float u_time;
+        varying vec2 vUv;
+        varying vec4 mvPosition;
+        varying vec4 mvNormal;
+        
+        void main() {
+          vec4 baseColor = vec4(0.1,0.8,0.4,0.);
+          vec2 offset = vec2(0.,u_time/1000.*0.2);
+          vec4 texel = texture2D(u_texture,vUv+offset);
+          baseColor.a = texel.r;
+           
+          float value = abs(dot(normalize(mvNormal), normalize(-mvPosition)));
+          float rim = pow(1.1 - value,2.5)*5.;
+          gl_FragColor =  baseColor*rim ;
+        }
+      `,
+  });
+
+  useEffect(() => {
+    const myIntervel = setInterval(() => {
+      customShaderMaterial.current.uniforms.u_time.value += 100;
+    }, 100);
+    return () => {
+      clearInterval(myIntervel);
+    };
+  }, []);
+
   return (
-    <>
-      <mesh visible={showBox}>
-        <boxGeometry args={[1.3, 1.3, 1.3]} />
-        <meshBasicMaterial color={"White"} />
-      </mesh>
-      <mesh visible={!dead && immune ? true : false}>
-        <sphereGeometry args={[1.5]} />
-        <meshBasicMaterial color={"#D87D68"} />
-      </mesh>
-      <mesh visible={dead ? true : false}>
-        <boxGeometry args={[2.3, 2.3, 2.3]} />
-        <meshBasicMaterial map={getPowerTexture()} />
-      </mesh>
-    </>
+    <mesh {...props}>
+      <sphereGeometry attach="geometry" args={[1.6, 32, 16]} />
+      <shaderMaterial attach="material" args={[customShaderMaterial.current]} />
+    </mesh>
   );
-});
+};
+
+export const SpellCard = (props) => {
+  return (
+    <mesh {...props}>
+      <boxGeometry args={[2.3, 2.3, 2.3]} />
+      <meshBasicMaterial map={getPowerTexture()} />
+    </mesh>
+  );
+};
 
 const Model = (props) => {
   switch (props.modelName) {
@@ -69,17 +117,14 @@ export const Character = (props) => {
     onCollideBegin: props.onCollideBegin,
   }));
 
-  const { showBox } = useUser();
-
   if (props.position !== undefined)
     api.position.set(props.position.x, props.position.y, props.position.z);
 
   return (
     <>
-      <group ref={ref}>
-        <Tools showBox={showBox} immune={props.immune} dead={props.dead} />
-      </group>
-      {props.dead === true ? null : <Model {...props} />}
+      <Shield visible={!props.dead && props.immune} position={props.position} />
+      <SpellCard visible={props.dead} position={props.position} />
+      <Model {...props} />
     </>
   );
 };
@@ -105,5 +150,5 @@ export const RotationCharacter = ({ modelName, spin, scale }) => {
     };
   }, [spin]);
 
-  return <Character modelName={modelName} rotation={rotation} scale={scale} />;
+  return <Model modelName={modelName} rotation={rotation} scale={scale} />;
 };

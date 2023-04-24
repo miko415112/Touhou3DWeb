@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Skybox, Ground } from "../components/environment";
+import { Shield, Column, Skybox, Ground } from "../components/environment";
 import { Physics } from "@react-three/cannon";
 import { Players } from "./players";
 import styled from "styled-components";
@@ -61,13 +61,14 @@ const keymap = {
   ArrowRight: "right",
   ArrowLeft: "left",
   KeyZ: "select",
-  KeyQ: "switch",
+  Escape: "switch",
 };
 
 const Scene = memo(() => {
   return (
     <Canvas>
       <Skybox />
+      <Column />
       <Physics>
         <Ground />
         <Players />
@@ -87,7 +88,7 @@ const GamePage = () => {
   const [selection, setSelection] = useState(0);
   const [showOption, setShowOption] = useState(false);
   const optionNumber = 2;
-  const options = ["Quit Game", showBox ? "Hide Box" : "Show Box"];
+  const options = ["Quit Game"];
   const movement = useKeyboard(keymap);
   /* temp data */
   const [win, setWin] = useState(false);
@@ -139,8 +140,6 @@ const GamePage = () => {
           navigate("/");
           break;
         case 1:
-          setShowBox((prev) => !prev);
-          break;
       }
       selectAudio.play();
     } else {

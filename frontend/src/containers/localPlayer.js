@@ -16,9 +16,9 @@ import {
 
 /* global settings */
 const fireTimeGap = [120, 1800, 2200, 1800];
-const leaderPosConstrains = [new Vector3(-13, 0, -6), new Vector3(-3, 4.5, 6)];
+const leaderPosConstrains = [new Vector3(-13, 0, -6), new Vector3(0, 4.5, 6)];
 const leaderSpawnPos = new Vector3(-5, 1, 0);
-const othersPosConstrains = [new Vector3(3, 0, -6), new Vector3(13, 4.5, 6)];
+const othersPosConstrains = [new Vector3(0, 0, -6), new Vector3(13, 4.5, 6)];
 const othersSpawnPos = new Vector3(5, 1, 0);
 
 /* imit the firing rate and permissions of bullets */
@@ -119,18 +119,16 @@ export const LocalPlayer = () => {
   };
 
   return (
-    <>
-      <Character
-        modelName={modelName}
-        position={rigidState?.modelPos}
-        rotation={rigidState?.modelEuler}
-        scale={0.1}
-        mask={1}
-        group={1}
-        onCollideBegin={handleCollision}
-        immune={immune.current}
-        dead={healthPoints <= 0}
-      />
-    </>
+    <Character
+      modelName={modelName}
+      position={rigidState?.modelPos}
+      rotation={rigidState?.modelEuler}
+      scale={0.1}
+      mask={1}
+      group={1}
+      onCollideBegin={handleCollision}
+      immune={immune.current}
+      dead={healthPoints <= 0}
+    />
   );
 };
