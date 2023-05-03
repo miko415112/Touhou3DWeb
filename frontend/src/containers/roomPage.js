@@ -80,7 +80,7 @@ const RoomPage = () => {
   const [onlineFriends, setOnlineFriends] = useState([]);
   /* user-defined hook */
   const { signIn, profile, setModelName, setIsLeader } = useUser();
-  const { playerList, roomState, roomID, message } = network.useNetwork();
+  const { playerList, netLocation, roomID, message } = network.useNetwork();
   /* switch pages */
   const navigate = useNavigate();
 
@@ -90,13 +90,15 @@ const RoomPage = () => {
     if (!signIn) navigate("/login");
   }, [signIn]);
 
-  /* redirect to game page*/
+  /* handle netLocation change */
 
   useEffect(() => {
-    if (roomState === "playing" && roomID) {
+    if (netLocation === "game") {
       navigate("/game");
+    } else if (netLocation === "home") {
+      navigate("/");
     }
-  }, [roomState, roomID]);
+  }, [netLocation]);
 
   /* update player state(waiting,choosing,read) and modelname */
 
@@ -144,7 +146,8 @@ const RoomPage = () => {
         });
     }
     if (inviteModalOpen) {
-      setInterval(fetchData, 1000);
+      fetchData();
+      setInterval(fetchData, 2000);
     } else {
       clearInterval(fetchData);
     }
@@ -178,7 +181,6 @@ const RoomPage = () => {
             break;
           case 1:
             network.leaveRoom(roomID, profile.email);
-            navigate("/");
             break;
           case 2:
             setInviteModalOpen(true);

@@ -102,7 +102,6 @@ const handleCreateRoom = (socket) => {
 
     rooms.set(roomID, {
       playerList: playerList,
-      roomState: "choosing",
       roomID: roomID,
     });
     socket.join(roomID);
@@ -111,6 +110,8 @@ const handleCreateRoom = (socket) => {
       type: "success",
       msg: "created room successfully",
     });
+
+    socket.emit("NetLocation", "room");
 
     console.log(`user ${email} created room ${roomID}`);
   });
@@ -153,6 +154,8 @@ const handleJoinRoom = (socket) => {
       msg: "joined room successfully",
     });
 
+    socket.emit("NetLocation", "room");
+
     console.log(`user ${email} joined room ${roomID}`);
   });
 };
@@ -173,12 +176,12 @@ const handleStartGame = (socket) => {
       return;
     }
 
-    room.roomState = "playing";
-
     socket.emit("Message", {
       type: "success",
       msg: "started room successfully",
     });
+
+    socket.emit("NetLocation", "game");
 
     console.log(`room ${roomID} started`);
   });
@@ -228,6 +231,8 @@ const handleLeaveRoom = (socket) => {
       type: "success",
       msg: "left room successfully",
     });
+
+    socket.emit("NetLocation", "home");
 
     console.log(`user ${email} has left room ${roomID}`);
   });

@@ -215,9 +215,20 @@ export const Bullets = () => {
         if (!player.rigidState.modelEuler) return;
 
         for (let j = 0; j < player.fireState?.length; j++) {
+          /* check whether it's NEW fireState or not */
+          const exist = newBulletList.some((bullet, index, self) => {
+            return (
+              bullet.player_email === player.email &&
+              bullet.key === player.timeStamp
+            );
+          });
+
+          if (exist) continue;
+
           newBulletList.push({
+            player_email: player.email,
             type: player.fireState[j],
-            key: Date.now(),
+            key: player.timeStamp,
             group: player.email === profile.email ? 0 : 1,
             modelPos: player.rigidState.modelPos,
             modelEuler: player.rigidState.modelEuler,

@@ -78,6 +78,7 @@ export const LocalPlayer = () => {
         fireState: validFireState,
         healthPoints,
         immune: immune.current,
+        timeStamp: curTime,
       });
       preUpdateTime.current = Date.now();
       handleFireAudio(validFireState);

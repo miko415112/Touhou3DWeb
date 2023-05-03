@@ -54,7 +54,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   /* user-defined hook */
   const { signIn, profile, setSignIn, setProfile } = useUser();
-  const { message, roomState, roomID, invitation } = network.useNetwork();
+  const { message, netLocation, roomID, invitation } = network.useNetwork();
   /* temp data */
   const [requests, setRequests] = useState([]);
   const [friends, setFriends] = useState([]);
@@ -65,10 +65,11 @@ const HomePage = () => {
     if (!signIn) navigate("/login");
   }, [signIn]);
 
-  /* redirect to room page */
+  /* handle netLocation change */
+
   useEffect(() => {
-    if (roomState === "choosing" && roomID) navigate("/room");
-  }, [roomState, roomID]);
+    if (netLocation === "room") navigate("/room");
+  }, [netLocation]);
 
   /* keep fetching data when friendsModalOpen is true */
 
@@ -81,7 +82,8 @@ const HomePage = () => {
     }
 
     if (friendsModalOpen) {
-      setInterval(fetchData, 1000);
+      fetchData();
+      setInterval(fetchData, 2000);
     } else {
       clearInterval(fetchData);
     }

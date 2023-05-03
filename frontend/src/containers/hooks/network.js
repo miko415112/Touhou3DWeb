@@ -145,7 +145,7 @@ export const network = {
 
   useNetwork: () => {
     const [playerList, setPlayerList] = useState();
-    const [roomState, setRoomState] = useState();
+    const [netLocation, setNetLocation] = useState();
     const [roomID, setRoomID] = useState();
     const [invitation, setInvitation] = useState();
     const [message, setMessage] = useState({});
@@ -155,9 +155,12 @@ export const network = {
         setMessage(msg);
       }
 
+      function handleNetLocation(NetLocation) {
+        setNetLocation(NetLocation);
+      }
+
       function handleRoomInfo(room) {
         setPlayerList(room.playerList);
-        setRoomState(room.roomState);
         setRoomID(room.roomID);
       }
 
@@ -165,6 +168,7 @@ export const network = {
         setInvitation(invitation);
       }
       socket.on("Message", handleMessage);
+      socket.on("NetLocation", handleNetLocation);
       socket.on("RoomInfo", handleRoomInfo);
       socket.on("Invitation", handleInvitation);
       return () => {
@@ -176,7 +180,7 @@ export const network = {
 
     return {
       playerList,
-      roomState,
+      netLocation,
       roomID,
       invitation,
       message,

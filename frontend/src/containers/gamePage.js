@@ -80,8 +80,8 @@ const Scene = memo(() => {
 
 const GamePage = () => {
   /* user-defined hook */
-  const { playerList, roomID } = network.useNetwork();
-  const { signIn, profile, isLeader, showBox, setShowBox } = useUser();
+  const { playerList, netLocation, roomID } = network.useNetwork();
+  const { signIn, profile, isLeader } = useUser();
   /* switch pages */
   const navigate = useNavigate();
   /* optionPanel */
@@ -99,6 +99,14 @@ const GamePage = () => {
   useEffect(() => {
     if (!signIn) navigate("/login");
   }, [signIn]);
+
+  /* handle netLocation change */
+
+  useEffect(() => {
+    if (netLocation === "home") {
+      navigate("/");
+    }
+  }, [netLocation]);
 
   /* game logic */
   useEffect(() => {
@@ -137,7 +145,6 @@ const GamePage = () => {
       switch (selection) {
         case 0:
           network.leaveRoom(roomID, profile.email);
-          navigate("/");
           break;
         case 1:
       }
