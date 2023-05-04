@@ -111,7 +111,7 @@ const handleCreateRoom = (socket) => {
       msg: "created room successfully",
     });
 
-    socket.emit("NetLocation", "room");
+    socket.emit("Redirect", "room");
 
     console.log(`user ${email} created room ${roomID}`);
   });
@@ -154,7 +154,7 @@ const handleJoinRoom = (socket) => {
       msg: "joined room successfully",
     });
 
-    socket.emit("NetLocation", "room");
+    socket.emit("Redirect", "room");
 
     console.log(`user ${email} joined room ${roomID}`);
   });
@@ -181,7 +181,7 @@ const handleStartGame = (socket) => {
       msg: "started room successfully",
     });
 
-    socket.emit("NetLocation", "game");
+    socket.emit("Redirect", "game");
 
     console.log(`room ${roomID} started`);
   });
@@ -232,7 +232,7 @@ const handleLeaveRoom = (socket) => {
       msg: "left room successfully",
     });
 
-    socket.emit("NetLocation", "home");
+    socket.emit("Redirect", "home");
 
     console.log(`user ${email} has left room ${roomID}`);
   });

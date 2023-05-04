@@ -1,7 +1,6 @@
 import { io } from "socket.io-client";
 import axios from "axios";
 import { useState, useEffect } from "react";
-
 /* global settings */
 
 const ROOT =
@@ -145,7 +144,7 @@ export const network = {
 
   useNetwork: () => {
     const [playerList, setPlayerList] = useState();
-    const [netLocation, setNetLocation] = useState();
+    const [redirect, setRedirect] = useState();
     const [roomID, setRoomID] = useState();
     const [invitation, setInvitation] = useState();
     const [message, setMessage] = useState({});
@@ -155,8 +154,8 @@ export const network = {
         setMessage(msg);
       }
 
-      function handleNetLocation(NetLocation) {
-        setNetLocation(NetLocation);
+      function handleRedirect(redirect) {
+        setRedirect(redirect);
       }
 
       function handleRoomInfo(room) {
@@ -168,7 +167,7 @@ export const network = {
         setInvitation(invitation);
       }
       socket.on("Message", handleMessage);
-      socket.on("NetLocation", handleNetLocation);
+      socket.on("Redirect", handleRedirect);
       socket.on("RoomInfo", handleRoomInfo);
       socket.on("Invitation", handleInvitation);
       return () => {
@@ -180,7 +179,7 @@ export const network = {
 
     return {
       playerList,
-      netLocation,
+      redirect,
       roomID,
       invitation,
       message,

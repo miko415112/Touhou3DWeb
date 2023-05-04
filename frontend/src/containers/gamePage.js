@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Shield, Column, Skybox, Ground } from "../components/environment";
+import { Column, Skybox, Ground } from "../components/environment";
 import { Physics } from "@react-three/cannon";
 import { Players } from "./players";
 import styled from "styled-components";
@@ -13,6 +13,7 @@ import { useUser } from "./hooks/context";
 import { Bullets } from "./bullets";
 import { GamePageProfile } from "../components/profile";
 import { changeAudio, selectAudio } from "../components/resource";
+import { displayStatus } from "../components/info";
 
 const GamePageWrapper = styled.div`
   width: 1200px;
@@ -80,8 +81,8 @@ const Scene = memo(() => {
 
 const GamePage = () => {
   /* user-defined hook */
-  const { playerList, netLocation, roomID } = network.useNetwork();
-  const { signIn, profile, isLeader } = useUser();
+  const { playerList, redirect, roomID } = network.useNetwork();
+  const { signIn, setSignIn, profile, isLeader } = useUser();
   /* switch pages */
   const navigate = useNavigate();
   /* optionPanel */
@@ -94,19 +95,23 @@ const GamePage = () => {
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
 
-  /* redirect to login page */
-
+  /* check if the user is already signed in */
   useEffect(() => {
     if (!signIn) navigate("/login");
+    if (signIn && Object.keys(profile).length === 0) {
+      displayStatus({
+        type: "error",
+        msg: "Sign in failed",
+      });
+      setSignIn(false);
+    }
   }, [signIn]);
 
   /* handle netLocation change */
-
   useEffect(() => {
-    if (netLocation === "home") {
-      navigate("/");
-    }
-  }, [netLocation]);
+    if (redirect === "home") navigate("/");
+    else if (redirect === "room") navigate("/room");
+  }, [redirect]);
 
   /* game logic */
   useEffect(() => {

@@ -79,29 +79,30 @@ const RoomPage = () => {
   const [friends, setFriends] = useState([]);
   const [onlineFriends, setOnlineFriends] = useState([]);
   /* user-defined hook */
-  const { signIn, profile, setModelName, setIsLeader } = useUser();
-  const { playerList, netLocation, roomID, message } = network.useNetwork();
+  const { signIn, setSignIn, profile, setModelName, setIsLeader } = useUser();
+  const { playerList, redirect, roomID, message } = network.useNetwork();
   /* switch pages */
   const navigate = useNavigate();
 
-  /* redirect to login page */
-
+  /* check if the user is already signed in */
   useEffect(() => {
     if (!signIn) navigate("/login");
+    if (signIn && Object.keys(profile).length === 0) {
+      displayStatus({
+        type: "error",
+        msg: "Sign in failed",
+      });
+      setSignIn(false);
+    }
   }, [signIn]);
 
   /* handle netLocation change */
-
   useEffect(() => {
-    if (netLocation === "game") {
-      navigate("/game");
-    } else if (netLocation === "home") {
-      navigate("/");
-    }
-  }, [netLocation]);
+    if (redirect === "game") navigate("/game");
+    else if (redirect === "home") navigate("/");
+  }, [redirect]);
 
   /* update player state(waiting,choosing,read) and modelname */
-
   useEffect(() => {
     network.updatePlayer(roomID, profile.email, {
       modelName: characterList[modelIndex],

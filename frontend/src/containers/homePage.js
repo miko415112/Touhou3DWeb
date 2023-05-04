@@ -54,22 +54,27 @@ const HomePage = () => {
   const navigate = useNavigate();
   /* user-defined hook */
   const { signIn, profile, setSignIn, setProfile } = useUser();
-  const { message, netLocation, roomID, invitation } = network.useNetwork();
+  const { message, redirect, invitation } = network.useNetwork();
   /* temp data */
   const [requests, setRequests] = useState([]);
   const [friends, setFriends] = useState([]);
 
-  /* redirect to login page */
-
+  /* check if the user is already signed in */
   useEffect(() => {
     if (!signIn) navigate("/login");
+    if (signIn && Object.keys(profile).length === 0) {
+      displayStatus({
+        type: "error",
+        msg: "Sign in failed",
+      });
+      setSignIn(false);
+    }
   }, [signIn]);
 
   /* handle netLocation change */
-
   useEffect(() => {
-    if (netLocation === "room") navigate("/room");
-  }, [netLocation]);
+    if (redirect === "room") navigate("/room");
+  }, [redirect]);
 
   /* keep fetching data when friendsModalOpen is true */
 
