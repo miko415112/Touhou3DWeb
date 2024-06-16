@@ -77,7 +77,7 @@ const NameWrapper = styled.div`
 `;
 
 export const PlayerCard = forwardRef((props, ref) => {
-  const { name, state, showArrow, isLeader } = props;
+  const { name, state, showArrow, isMe } = props;
   let color = "";
   let icon = null;
   switch (state) {
@@ -98,7 +98,7 @@ export const PlayerCard = forwardRef((props, ref) => {
   return (
     <PlayerWrapper>
       <NameWrapper>
-        {isLeader ? (
+        {isMe ? (
           <AimOutlined style={{ color: "Yellow", fontSize: "25px" }} />
         ) : null}
         <div className="name">{name}</div>

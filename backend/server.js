@@ -1,22 +1,11 @@
 import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
 import cors from "cors";
 import path from "path";
 import bodyParser from "body-parser";
-import { registerHandler } from "./socket";
+import { registerHandler } from "./routers/webSocketRouter";
 import db from "./mongo/db";
-import { authRouter, apiRouter } from "./router";
-
-/* express + socket.io + httpserver(support both) */
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-  },
-  path: "/api/socket",
-});
+import { app, httpServer, io } from "./instance";
+import { authRouter, apiRouter } from "./routers/httpRouter";
 
 /* mongo logic */
 db.connect();

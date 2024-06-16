@@ -1,11 +1,8 @@
-import { useControl } from "./hooks/control";
+import { useControl } from "../hooks/control";
 import { useThree } from "@react-three/fiber";
-import { useState, useEffect, useRef } from "react";
-
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Character } from "../components/character";
-import { network } from "./hooks/network";
-import { useUser } from "./hooks/context";
-import { Vector3 } from "three";
+import { Euler, Vector3 } from "three";
 import {
   deadAudio,
   shoot0Audio,
@@ -14,85 +11,66 @@ import {
   shoot3Audio,
 } from "../components/resource";
 
-/* global settings */
-const fireTimeGap = [120, 1800, 2200, 1800];
-const leaderPosConstrains = [new Vector3(-13, 0, -6), new Vector3(0, 4.5, 6)];
-const leaderSpawnPos = new Vector3(-5, 1, 0);
-const othersPosConstrains = [new Vector3(0, 0, -6), new Vector3(13, 4.5, 6)];
-const othersSpawnPos = new Vector3(5, 1, 0);
+import { useSelector } from "react-redux";
+import { updatePlayer } from "../services/webSocketService";
 
-/* imit the firing rate and permissions of bullets */
-const validateFireState = (
-  fireTimeArray,
-  isLeader,
-  healthPoints,
-  fireState
-) => {
-  const validFireState = [];
-  if (healthPoints > 0) {
-    const curTime = Date.now();
-    for (let i = 0; i < fireState.length; i++) {
-      const shootIndex = parseInt(fireState[i].replace("shoot", ""));
-      if (
-        (isLeader || shootIndex === 0) &&
-        curTime - fireTimeArray[shootIndex] > fireTimeGap[shootIndex]
-      ) {
-        validFireState.push(fireState[i]);
-        fireTimeArray[shootIndex] = curTime;
-      }
-    }
-  }
-  return validFireState;
-};
+/* global settings */
+const posConstrains = [new Vector3(0, 0.2, -8), new Vector3(12, 10, 8)];
+const spawnPos = new Vector3(10, 1, 0);
+const spawnEuler = new Euler(0, Math.PI / 2, 0);
 
 export const LocalPlayer = () => {
-  /* user-defined hook */
-  const { modelName, profile, isLeader } = useUser();
-  const posConstrains = isLeader ? leaderPosConstrains : othersPosConstrains;
-  const spawnPos = isLeader ? leaderSpawnPos : othersSpawnPos;
-  const { rigidState, fireState } = useControl(spawnPos, posConstrains);
-  const { roomID } = network.useNetwork();
-  const { camera } = useThree();
+  /* global state */
+  const profile = useSelector((state) => state.account.profile);
+  const players = useSelector((state) => state.game.players);
+  const roomInfo = useSelector((state) => state.game.roomInfo);
+  const me = players.find((player) => player.email == profile.email);
 
-  /* temp data */
-  const [healthPoints, setHealthPoints] = useState(4);
+  /* user-defined hook */
+  const { camera } = useThree();
+  const { cameraPos, cameraEuler, modelPos, modelEuler, fireState } =
+    useControl(spawnPos, spawnEuler, posConstrains);
+  const [healthPoints, setHealthPoints] = useState(20);
   const preUpdateTime = useRef(0);
-  const preFireTime = useRef([0, 0, 0, 0]);
   const immune = useRef(false);
 
-  camera.position.copy(rigidState.cameraPos);
-  camera.rotation.setFromVector3(rigidState.cameraEuler);
-
-  /* shared params */
-  useEffect(() => {
-    const curTime = Date.now();
-    if (curTime - preUpdateTime.current > 80) {
-      const validFireState = validateFireState(
-        preFireTime.current,
-        isLeader,
-        healthPoints,
-        fireState
-      );
-      network.updatePlayer(roomID, profile.email, {
-        rigidState,
-        fireState: validFireState,
-        healthPoints,
-        immune: immune.current,
-        timeStamp: curTime,
-      });
-      preUpdateTime.current = Date.now();
-      handleFireAudio(validFireState);
-    }
-  }, [rigidState, fireState, healthPoints]);
+  /* update camera */
+  useLayoutEffect(() => {
+    camera.rotation.copy(cameraEuler);
+    camera.position.copy(cameraPos);
+  }, [cameraPos, cameraEuler, modelPos, modelEuler]);
 
   useEffect(() => {
     if (healthPoints == 0) deadAudio.play();
   }, [healthPoints]);
 
+  /* update player */
+
+  useEffect(() => {
+    const curTime = Date.now();
+    let validFireState = [];
+    if (healthPoints > 0) validFireState = fireState;
+
+    if (curTime - preUpdateTime.current > 60) {
+      updatePlayer(roomInfo.roomID, {
+        modelPos,
+        modelEuler,
+        fireState: validFireState,
+        healthPoints,
+        immune: immune.current,
+        timestamp: curTime,
+      });
+
+      preUpdateTime.current = Date.now();
+      handleFireAudio(fireState);
+    }
+  }, [modelPos, modelEuler, fireState, healthPoints]);
+
   /* handle Audio depending on validFireState */
-  const handleFireAudio = (validFireState) => {
-    for (let i = 0; i < validFireState.length; i++) {
-      switch (validFireState[i]) {
+  const handleFireAudio = (fireState) => {
+    for (let i = 0; i < fireState.length; i++) {
+      console.log(fireState[i]["type"]);
+      switch (fireState[i]["type"]) {
         case "shoot0":
           shoot0Audio.play();
           break;
@@ -120,16 +98,18 @@ export const LocalPlayer = () => {
   };
 
   return (
-    <Character
-      modelName={modelName}
-      position={rigidState?.modelPos}
-      rotation={rigidState?.modelEuler}
-      scale={0.1}
-      mask={1}
-      group={1}
-      onCollideBegin={handleCollision}
-      immune={immune.current}
-      dead={healthPoints <= 0}
-    />
+    <>
+      <Character
+        modelName={me?.modelName}
+        position={modelPos}
+        rotation={modelEuler}
+        scale={0.1}
+        mask={2 | 4}
+        group={1}
+        onCollideBegin={handleCollision}
+        immune={immune.current}
+        dead={healthPoints <= 0 ? true : false}
+      />
+    </>
   );
 };

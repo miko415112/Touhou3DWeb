@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
-import { network } from "./hooks/network";
 import { homeBackgroundImage } from "../components/resource";
-import { useKeyboard } from "./hooks/input";
+import { useKeyboard } from "../hooks/input";
 import { JoinRoomModal, FriendsModal } from "../components/modal";
 import { OptionPanel } from "../components/optionPanel";
-import { useUser } from "./hooks/context";
-import { displayStatus, displayInvitation } from "../components/info";
-import { HomePageProfile } from "../components/profile";
+import { HomePageProfile } from "../components/panel";
 import { changeAudio, selectAudio } from "../components/resource";
+import {
+  fetchFriends,
+  fetchFriendRequests,
+  logOutGame,
+  addFriendRequest,
+  acceptFriendRequest,
+  rejectFriendRequest,
+  removeFriend,
+} from "../services/httpService";
+import { createRoom, joinRoom } from "../services/webSocketService";
 
 const keymap = {
   ArrowUp: "up",
@@ -21,8 +28,9 @@ const keymap = {
 const HomePageWrapper = styled.div`
   background-image: url(${homeBackgroundImage});
   background-repeat: no-repeat;
-  width: 1200px;
-  height: 675px;
+  background-size: 100% 100%;
+  width: 1440px;
+  height: 700px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -52,45 +60,31 @@ const HomePage = () => {
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
   /* switch pages */
   const navigate = useNavigate();
-  /* user-defined hook */
-  const { signIn, profile, setSignIn, setProfile } = useUser();
-  const { message, redirect, invitation } = network.useNetwork();
-  /* temp data */
-  const [requests, setRequests] = useState([]);
-  const [friends, setFriends] = useState([]);
+  /* user data */
+  const profile = useSelector((state) => state.account.profile);
+  const roomInfo = useSelector((state) => state.game.roomInfo);
+  const friends = useSelector((state) => state.account.friends);
+  const requests = useSelector((state) => state.account.requests);
+  const chatMessages = useSelector((state) => state.message.chatMessages);
+
+  const dispatch = useDispatch();
 
   /* check if the user is already signed in */
   useEffect(() => {
-    if (!signIn) navigate("/login");
-    if (signIn && Object.keys(profile).length === 0) {
-      displayStatus({
-        type: "error",
-        msg: "Sign in failed",
-      });
-      setSignIn(false);
-    }
-  }, [signIn]);
+    if (Object.keys(profile).length == 0) navigate("/login");
+  }, [profile]);
 
   /* handle netLocation change */
   useEffect(() => {
-    if (redirect === "room") navigate("/room");
-  }, [redirect]);
+    if (Object.keys(roomInfo).length > 0) navigate("/room");
+  }, [roomInfo]);
 
   /* keep fetching data when friendsModalOpen is true */
 
   useEffect(() => {
-    function fetchData() {
-      network.openFriendSystem(profile.email).then(({ requests, friends }) => {
-        setRequests(requests);
-        setFriends(friends);
-      });
-    }
-
     if (friendsModalOpen) {
-      fetchData();
-      setInterval(fetchData, 2000);
-    } else {
-      clearInterval(fetchData);
+      dispatch(fetchFriends());
+      dispatch(fetchFriendRequests());
     }
   }, [friendsModalOpen]);
 
@@ -107,7 +101,7 @@ const HomePage = () => {
     if (movement.select) {
       switch (selection) {
         case 0:
-          network.createRoom(profile.email, profile.name, profile.picture);
+          createRoom();
           break;
         case 1:
           setJoinRoomModalOpen(true);
@@ -116,72 +110,37 @@ const HomePage = () => {
           setFriendsModalOpen(true);
           break;
         case 3:
-          network.logOutGame();
-          setSignIn(false);
-          setProfile({});
-          navigate("/login");
+          dispatch(logOutGame());
           break;
       }
       selectAudio.play();
     } else {
-      changeAudio.play();
+      if (movement.up || movement.down) changeAudio.play();
     }
   }, [movement]);
-
-  /* socket message */
-
-  useEffect(() => {
-    displayStatus(message);
-  }, [message]);
-
-  /* socket invitation */
-
-  useEffect(() => {
-    if (invitation)
-      displayInvitation(invitation.user, () => {
-        network.joinRoom(
-          profile.email,
-          profile.name,
-          profile.picture,
-          invitation.roomID
-        );
-      });
-  }, [invitation]);
 
   /* modal callback */
 
   const OnAddFriend = async (values) => {
     const email_to = values.email;
-    const email_from = profile.email;
-    const data = await network.addFriend(email_from, email_to);
-    displayStatus({ type: "success", msg: data.msg });
+    dispatch(addFriendRequest(email_to));
   };
 
-  const OnAcceptFriend = async (email_from) => {
-    const email_to = profile.email;
-    const data = await network.acceptFriend(email_from, email_to);
-    setRequests(data.requests);
-    setFriends(data.friends);
-    displayStatus({ type: "success", msg: data.msg });
+  const OnAcceptFriend = async (email_to) => {
+    dispatch(acceptFriendRequest(email_to));
   };
 
   const OnDeleteFriend = async (email_to) => {
-    const email_from = profile.email;
-    const data = await network.deleteFriend(email_from, email_to);
-    setFriends(data.friends);
-    displayStatus({ type: "success", msg: data.msg });
+    dispatch(removeFriend(email_to));
   };
 
   const OnDeleteRequest = async (email_to) => {
-    const email_from = profile.email;
-    const data = await network.deleteRequest(email_from, email_to);
-    setRequests(data.requests);
-    displayStatus({ type: "success", msg: data.msg });
+    dispatch(rejectFriendRequest(email_to));
   };
 
   const OnJoinRoom = (values) => {
     const roomID = values.roomID;
-    network.joinRoom(profile.email, profile.name, profile.picture, roomID);
+    joinRoom(roomID);
     setJoinRoomModalOpen(false);
   };
 

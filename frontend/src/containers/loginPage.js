@@ -1,14 +1,16 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { googleLoginImage, introImage } from "../components/resource";
-import { network } from "./hooks/network";
-import { useUser } from "./hooks/context";
 import { useEffect } from "react";
+import { signInGame } from "../services/httpService";
+import { useDispatch, useSelector } from "react-redux";
 
 const LoginPageWrapper = styled.div`
   display: flex;
-  width: 1200px;
-  height: 675px;
+  background-size: 100% 100%;
+  width: 1440px;
+  height: 700px;
+  padding-left: 20px;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
@@ -63,17 +65,17 @@ const GameInfo = () => {
         </li>
         <li>
           Game Operation: Use W/S to move up and down, A/D to rotate left and
-          right, the space bar to move forward, and H/J/K/L to shoot bullets.
-          (Note: Only the ghost can shoot four types of bullets, while others
-          can only use H.) Press ESC to open the menu, Shift to slow down the
-          character's movement speed.
+          right, the space bar to move forward, click the left mouse button to
+          shoot, press ESC to open the menu, and hold Shift to slow down the
+          character's movement (Note : press Capslock button to start orbital
+          control)
         </li>
       </ul>
       <h2>Game Rules</h2>
       <ul>
         <li>
           Each player has three lives, and the field is divided into two areas.
-          The ghost is on one side, and the remaining players are on the other
+          The boss is on one side, and the remaining players are on the other
           side. The movement range is limited, and players cannot move beyond
           the boundary.
         </li>
@@ -147,40 +149,42 @@ const GameInfo = () => {
             https://www.sounds-resource.com/pc_computer/touhoukoumakyoutheembodimentofscarletdevil/sound/327/
           </a>
         </li>
+        <li>
+          <a href="https://www.sounds-resource.com/pc_computer/touhoukoumakyoutheembodimentofscarletdevil/sound/327/">
+            https://www.youtube.com/@katukunazawa5121
+          </a>
+        </li>
       </ul>
     </div>
   );
 };
 
 const LoginPage = () => {
-  const { signIn, setSignIn, setProfile } = useUser();
   const navigate = useNavigate();
-
-  /* redirect to home page */
+  const dispatch = useDispatch();
+  const profile = useSelector((state) => state.account.profile);
 
   useEffect(() => {
-    if (signIn) navigate("/");
-  }, [signIn]);
+    if (Object.keys(profile).length > 0) navigate("/");
+  }, [profile]);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
+
+    if (code) {
+      dispatch(signInGame(code));
+    }
+  }, []);
 
   const handleLogin = async () => {
     /* get auth code */
-    const popup = window.open(
-      network.getOauthURL(),
-      "Google Oauth2",
-      "popup=yes"
-    );
-    const timer = setInterval(async () => {
-      const url = new URL(popup.location.href);
-      const code = url.searchParams.get("code");
-      /* use code to signIn */
-      if (code) {
-        const profile = await network.signInGame(code);
-        setSignIn(true);
-        setProfile(profile);
-        popup.close();
-        clearInterval(timer);
-      }
-    }, 500);
+    const auth_url =
+      process.env.NODE_ENV == "production"
+        ? window.location.origin
+        : process.env.REACT_APP_LOCAL_BACKEND_URL + "/auth/code";
+
+    window.location.href = auth_url;
   };
 
   return (
@@ -189,7 +193,7 @@ const LoginPage = () => {
         <ContentWrapper>
           <img src={introImage} />
           <LoginWrapper>
-            <div>Welcome To Login</div>
+            <div>Welcome to login</div>
             <GoogleButtonWrapper onClick={handleLogin}>
               <img src={googleLoginImage} />
             </GoogleButtonWrapper>

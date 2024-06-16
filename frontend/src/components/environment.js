@@ -7,9 +7,9 @@ import {
 import { useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 export const Column = () => {
-  const height = 5;
-  const radius = 0.25;
-  const width = 6;
+  const height = 12;
+  const radius = 0.8;
+  const width = 8;
 
   return (
     <>
@@ -44,7 +44,7 @@ export const Ground = () => {
     uniforms: {
       u_grassTexture: { value: grassTexture },
       u_dirtTexture: { value: dirtTexture },
-      u_boundary: { value: new Float32Array([-13, -6, 13, 6]) },
+      u_boundary: { value: new Float32Array([-5, -8, 12, 8]) },
     },
     vertexShader: `
           

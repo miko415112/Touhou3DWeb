@@ -1,36 +1,37 @@
 import { Euler, Vector3 } from "three";
-
 import { Character } from "../components/character";
-import { network } from "./hooks/network";
-import { useUser } from "./hooks/context";
 import { LocalPlayer } from "./localPlayer";
+import { useDispatch, useSelector } from "react-redux";
 
 /* display all players except myself */
 export const Players = () => {
   /* user-defined hook */
-  const { playerList } = network.useNetwork();
-  const { profile } = useUser();
+  const profile = useSelector((state) => state.account.profile);
+  const players = useSelector((state) => state.game.players);
+  const others = players?.filter(
+    (player) => player.email != profile.email && player.modelPos
+  );
 
   return (
     <>
       <LocalPlayer />
-      {playerList?.map((player, idx) => {
-        if (!player.rigidState) return null;
-        if (!player.rigidState.modelPos) return null;
-        if (!player.rigidState.modelEuler) return null;
-        if (player.email === profile.email) return null;
+      {others?.map((player, idx) => {
+        console.log(others);
+        const { email, modelName, modelPos, modelEuler, immune, healthPoints } =
+          player;
+
         return (
           <Character
-            key={profile}
-            modelName={player.modelName}
-            position={new Vector3().copy(player.rigidState.modelPos)}
-            rotation={new Euler().copy(player.rigidState.modelEuler)}
+            key={email}
+            modelName={modelName}
+            position={new Vector3().copy(modelPos)}
+            rotation={new Euler().copy(modelEuler)}
             scale={0.1}
-            mask={0}
-            group={0}
+            mask={1 | 4}
+            group={2}
             onCollideBegin={() => {}}
-            immune={player.immune}
-            dead={player.healthPoints <= 0}
+            immune={immune}
+            dead={healthPoints <= 0 ? true : false}
           />
         );
       })}

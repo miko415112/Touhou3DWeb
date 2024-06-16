@@ -172,17 +172,9 @@ export const FriendsModal = ({
   );
 };
 
-export const InviteModal = ({
-  open,
-  friends,
-  onlineFriends,
-  onInvite,
-  onCancel,
-}) => {
-  const offlineFriends = friends.filter(
-    (friend) =>
-      !onlineFriends.some((onlineFriend) => onlineFriend.email === friend.email)
-  );
+export const InviteModal = ({ open, friends, onInvite, onCancel }) => {
+  const offlineFriends = friends.filter((friend) => !friend.online);
+  const onlineFriends = friends.filter((friend) => friend.online);
 
   return (
     <Modal open={open} footer={null} onCancel={onCancel}>

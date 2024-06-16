@@ -1,10 +1,11 @@
-import { message, notification, Button } from 'antd';
+import { message, notification, Button } from "antd";
 import {
   CloseCircleFilled,
   CheckCircleFilled,
   CopyFilled,
-} from '@ant-design/icons';
-import styled from 'styled-components';
+  SmileOutlined,
+} from "@ant-design/icons";
+import styled from "styled-components";
 
 const TitleFont = styled.div`
   font-family: Alfa Slab One;
@@ -29,7 +30,7 @@ const EmailFont = styled.div`
 
 export const displayInvitation = (user, onAccept) => {
   notification.open({
-    placement: 'bottom',
+    placement: "bottom",
     message: <TitleFont>Invitation</TitleFont>,
     description: (
       <>
@@ -38,20 +39,20 @@ export const displayInvitation = (user, onAccept) => {
       </>
     ),
     duration: 0,
-    style: { width: 'fit-content', height: 'fit-content' },
+    style: { width: "fit-content", height: "fit-content" },
     key: user.name,
     btn: (
       <>
         <Button
-          type='link'
-          size='small'
+          type="link"
+          size="small"
           onClick={() => notification.destroy(user.name)}
         >
           Reject
         </Button>
         <Button
-          type='primary'
-          size='small'
+          type="primary"
+          size="small"
           onClick={() => {
             onAccept();
             notification.destroy(user.name);
@@ -64,55 +65,60 @@ export const displayInvitation = (user, onAccept) => {
   });
 };
 
-export const displayRoomID = (roomID) => {
+export const displayRoomID = (roomID, onClick) => {
   notification.open({
-    placement: 'bottom',
+    placement: "bottom",
     message: (
       <>
-        <div style={{ display: 'inline', fontSize: '20px' }}>RoomID</div>
+        <div style={{ display: "inline", fontSize: "20px" }}>RoomID</div>
         <Button
-          onClick={() => {
-            navigator.clipboard.writeText(roomID).then(() => {
-              const msg = {
-                type: 'success',
-                msg: 'RoomID copied',
-              };
-              displayStatus(msg);
-            });
-          }}
-          style={{ border: 'none' }}
-          icon={<CopyFilled style={{ fontSize: '20px' }} />}
+          onClick={onClick}
+          style={{ border: "none" }}
+          icon={<CopyFilled style={{ fontSize: "20px" }} />}
         />
       </>
     ),
     description: (
-      <div style={{ backgroundColor: 'rgba(0,0,0,0.1)', fontSize: '18px' }}>
+      <div style={{ backgroundColor: "rgba(0,0,0,0.1)", fontSize: "18px" }}>
         {roomID}
       </div>
     ),
-    duration: 0,
-    style: { width: 'fit-content', height: 'fit-content' },
+    duration: 10,
+    style: { width: "35vw", height: "fit-content" },
   });
 };
 
 export const displayStatus = (s) => {
-  if (s.msg) {
-    const { type, msg } = s;
+  if (s.text) {
+    const { type, text, title } = s;
     switch (type) {
-      case 'success':
+      case "success":
         message.success({
-          content: msg,
+          content: text,
           duration: 3,
-          icon: <CheckCircleFilled style={{ fontSize: '25px' }} />,
-          style: { fontSize: '20px' },
+          icon: <CheckCircleFilled style={{ fontSize: "25px" }} />,
+          style: { fontSize: "20px" },
         });
         break;
-      case 'error':
+      case "error":
         message.error({
-          content: msg,
+          content: text,
           duration: 3,
-          icon: <CloseCircleFilled style={{ fontSize: '25px' }} />,
-          style: { fontSize: '20px' },
+          icon: (
+            <CloseCircleFilled
+              style={{ fontSize: "25px", marginLeft: "0px" }}
+            />
+          ),
+          style: { fontSize: "20px" },
+        });
+        break;
+      case "tips":
+        notification.open({
+          placement: "top",
+          message: "Tips",
+          description: text,
+          duration: 10,
+          icon: <SmileOutlined style={{ color: "#108ee9" }} />,
         });
         break;
     }

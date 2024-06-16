@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { Euler, Quaternion, Vector3 } from "three";
 import {
   RemiliaModel,
@@ -80,14 +80,15 @@ export const Shield = (props) => {
   );
 };
 
-export const SpellCard = (props) => {
+export const SpellCard = memo((props) => {
+  const texture = useMemo(() => getPowerTexture(), []);
   return (
     <mesh {...props}>
       <boxGeometry args={[2.3, 2.3, 2.3]} />
-      <meshBasicMaterial map={getPowerTexture()} />
+      <meshBasicMaterial map={texture} />
     </mesh>
   );
-};
+});
 
 const Model = (props) => {
   switch (props.modelName) {

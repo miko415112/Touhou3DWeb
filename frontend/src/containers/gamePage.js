@@ -1,25 +1,26 @@
-import { Canvas } from "@react-three/fiber";
-import { Column, Skybox, Ground } from "../components/environment";
-import { Physics } from "@react-three/cannon";
-import { Players } from "./players";
 import styled from "styled-components";
 import { OptionPanel } from "../components/optionPanel";
-import { useState, useEffect, memo } from "react";
-
+import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useKeyboard } from "./hooks/input";
-import { network } from "./hooks/network";
-import { useUser } from "./hooks/context";
-import { Bullets } from "./bullets";
-import { GamePageProfile } from "../components/profile";
+import { useKeyboard } from "../hooks/input";
+import { GamePageProfile, StagePanel } from "../components/panel";
 import { changeAudio, selectAudio } from "../components/resource";
-import { displayStatus } from "../components/info";
+import { leaveRoom } from "../services/webSocketService";
+import { Scene } from "./scene";
+import {
+  loadingGif,
+  stage1Audio,
+  stage2Audio,
+  stage3Audio,
+} from "../components/resource";
 
 const GamePageWrapper = styled.div`
-  width: 1200px;
-  height: 675px;
+  background-size: 100% 100%;
+  width: 1440px;
+  height: 700px;
   position: relative;
-
+  cursor: none;
   .optionPanel {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -63,76 +64,80 @@ const keymap = {
   ArrowLeft: "left",
   KeyZ: "select",
   Escape: "switch",
+  Space: "start",
 };
 
-const Scene = memo(() => {
-  return (
-    <Canvas>
-      <Skybox />
-      <Column />
-      <Physics>
-        <Ground />
-        <Players />
-        <Bullets />
-      </Physics>
-    </Canvas>
-  );
-});
-
 const GamePage = () => {
-  /* user-defined hook */
-  const { playerList, redirect, roomID } = network.useNetwork();
-  const { signIn, setSignIn, profile, isLeader } = useUser();
+  /* global data */
+  const profile = useSelector((state) => state.account.profile);
+  const players = useSelector((state) => state.game.players);
+  const roomInfo = useSelector((state) => state.game.roomInfo);
+  const dispatch = useDispatch();
+
   /* switch pages */
   const navigate = useNavigate();
+
   /* optionPanel */
   const [selection, setSelection] = useState(0);
   const [showOption, setShowOption] = useState(false);
   const optionNumber = 2;
   const options = ["Quit Game"];
   const movement = useKeyboard(keymap);
-  /* temp data */
+
+  /* container data */
+  const [loading, setLoading] = useState(true);
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
 
   /* check if the user is already signed in */
   useEffect(() => {
-    if (!signIn) navigate("/login");
-    if (signIn && Object.keys(profile).length === 0) {
-      displayStatus({
-        type: "error",
-        msg: "Sign in failed",
-      });
-      setSignIn(false);
+    if (Object.keys(profile).length == 0) navigate("/login");
+    if (Object.keys(roomInfo).length == 0) navigate("/");
+    if (roomInfo.roomState == "choosing") navigate("/room");
+  }, [profile, roomInfo]);
+
+  /* stage control */
+  useEffect(() => {
+    return () => {
+      stage1Audio.pause();
+      stage2Audio.pause();
+      stage3Audio.pause();
+
+      stage1Audio.currentTime = 0;
+      stage2Audio.currentTime = 0;
+      stage3Audio.currentTime = 0;
+    };
+  }, []);
+
+  useEffect(() => {
+    const { stage, startStage } = roomInfo;
+
+    stage1Audio.pause();
+    stage2Audio.pause();
+    stage3Audio.pause();
+
+    if (!stage || !startStage) return;
+
+    if (stage == 1) {
+      stage1Audio.play();
     }
-  }, [signIn]);
+    if (stage == 2) {
+      stage2Audio.play();
+    }
+    if (stage == 3) {
+      stage3Audio.play();
+    }
+  }, [roomInfo]);
 
-  /* handle netLocation change */
   useEffect(() => {
-    if (redirect === "home") navigate("/");
-    else if (redirect === "room") navigate("/room");
-  }, [redirect]);
-
-  /* game logic */
-  useEffect(() => {
-    if (!playerList) return;
-    const leader = playerList.filter((player) => player.isLeader)[0];
-    const others = playerList.filter((player) => !player.isLeader);
-    if (others.length <= 0) return;
-    const leaderDead = leader.healthPoints <= 0;
-    let AllOthersDead = true;
-    others.forEach((player) => {
-      if (player.healthPoints > 0 || player.healthPoints === undefined)
-        AllOthersDead = false;
-    });
-    if (isLeader && AllOthersDead && !win) setWin(true);
-    else if (isLeader && leaderDead && !lose) setLose(true);
-    else if (!isLeader && leaderDead && !win) setWin(true);
-    else if (!isLeader && AllOthersDead && !lose) setLose(true);
-  }, [playerList]);
+    const AllPlayersDead = !players.some((player) =>
+      player.healthPoints ? player.healthPoints > 0 : true
+    );
+    if (roomInfo.stage == 4) setWin(true);
+    if (AllPlayersDead) setLose(true);
+  }, [roomInfo, players]);
 
   /* execute option */
-
   useEffect(() => {
     if (movement.switch) {
       setShowOption((prev) => !prev);
@@ -149,7 +154,7 @@ const GamePage = () => {
     if (movement.select) {
       switch (selection) {
         case 0:
-          network.leaveRoom(roomID, profile.email);
+          leaveRoom(roomInfo.roomID);
           break;
         case 1:
       }
@@ -159,6 +164,17 @@ const GamePage = () => {
     }
   }, [movement]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (loading) {
+    return <img src={loadingGif} alt="Loading..." />;
+  }
   return (
     <GamePageWrapper>
       <Scene />
@@ -170,7 +186,8 @@ const GamePage = () => {
           {win ? "YOU WIN" : "YOU LOSE"}
         </ResultWrapper>
       ) : null}
-      <GamePageProfile playerList={playerList} />
+      <GamePageProfile />
+      <StagePanel />
     </GamePageWrapper>
   );
 };

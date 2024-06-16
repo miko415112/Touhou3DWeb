@@ -1,7 +1,7 @@
 import {
   CubeTextureLoader,
   TextureLoader,
-  sRGBEncoding,
+  SRGBColorSpace,
   RepeatWrapping,
 } from "three";
 
@@ -34,7 +34,7 @@ export const getSkyboxTextureArray = () => {
     require("./resource/skybox/corona_lf.png"),
   ]);
 
-  textureArray.encoding = sRGBEncoding;
+  textureArray.encoding = SRGBColorSpace;
 
   return textureArray;
 };
@@ -60,9 +60,37 @@ export const getLargeBulletTexture = () => {
   return texture;
 };
 
-export const getNormalBulletTexture = () => {
+export const getGreenBulletTexture = () => {
   const texture = textureLoader.load(
-    require("./resource/bullet/normalBullet.png")
+    require("./resource/bullet/greenBullet.png")
+  );
+  return texture;
+};
+
+export const getRedBulletTexture = () => {
+  const texture = textureLoader.load(
+    require("./resource/bullet/redBullet.png")
+  );
+  return texture;
+};
+
+export const getPurpleBulletTexture = () => {
+  const texture = textureLoader.load(
+    require("./resource/bullet/purpleBullet.png")
+  );
+  return texture;
+};
+
+export const getYellowBulletTexture = () => {
+  const texture = textureLoader.load(
+    require("./resource/bullet/yellowBullet.png")
+  );
+  return texture;
+};
+
+export const getGrayBulletTexture = () => {
+  const texture = textureLoader.load(
+    require("./resource/bullet/grayBullet.png")
   );
   return texture;
 };
@@ -185,6 +213,7 @@ export const SanaeModel = (props) => {
   );
 };
 
+export const bossIcon = require("./resource/275px-Th105Remilia.png");
 export const roomBackgroundImage = require("./resource/roomBackground.jpg");
 export const homeBackgroundImage = require("./resource/background.png");
 export const nameBorderImage = require("./resource/nameBorder.png");
@@ -201,6 +230,15 @@ export const shoot0Audio = new Audio(require("./resource/sound/se_tan01.wav"));
 export const shoot1Audio = new Audio(require("./resource/sound/se_option.wav"));
 export const shoot2Audio = new Audio(require("./resource/sound/kira00.wav"));
 export const shoot3Audio = new Audio(require("./resource/sound/se_tan02.wav"));
+export const stage1Audio = new Audio(
+  require("./resource/sound/東方原曲   紅魔郷　１面ボス・ルーミアのテーマ　妖魔夜行 (320).mp3")
+);
+export const stage2Audio = new Audio(
+  require("./resource/sound/東方原曲　永夜抄　４面ボス霧雨 魔理沙のテーマ　恋色マスタースパーク (320).mp3")
+);
+export const stage3Audio = new Audio(
+  require("./resource/sound/東方原曲　永夜抄　EXTRAボス藤原 妹紅のテーマ　月まで届け、不死の煙 (320).mp3")
+);
 
 useGLTF.preload("model/Remilia/scene.gltf");
 useGLTF.preload("model/Koishi/scene.gltf");
