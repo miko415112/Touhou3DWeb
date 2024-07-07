@@ -3,7 +3,7 @@ EXPOSE ${PORT}
 COPY . /app
 WORKDIR /app
 RUN corepack enable
-RUN yarn install
-RUN yarn build
+RUN npm install
+RUN npm run build
 
-CMD ["yarn", "deploy"]
+CMD ["npm", "run", "deploy"]

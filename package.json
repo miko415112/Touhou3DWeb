@@ -4,10 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cd frontend && yarn start",
-    "server": "cd backend && yarn server",
-    "build": "cd frontend && yarn build",
-    "deploy": "cd backend && yarn deploy",
-    "install": "cd frontend && yarn install --freeze-lockfile && cd ../backend && yarn install --freeze-lockfile"
+    "start": "cd frontend && npm run start",
+    "server": "cd backend && npm run server",
+    "build": "cd frontend && npm run build",
+    "deploy": "cd backend && npm run deploy",
+    "install": "cd frontend && npm install  && cd ../backend && npm install"
   }
 }
