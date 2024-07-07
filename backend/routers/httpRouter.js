@@ -26,7 +26,7 @@ const createClient = (req, res, next) => {
     req.client = client;
     next();
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(400).send(error.message + redirect_url.href);
   }
 };
 
