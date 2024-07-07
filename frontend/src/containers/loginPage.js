@@ -178,12 +178,14 @@ const LoginPage = () => {
   }, []);
 
   const handleLogin = async () => {
+    console.log(process.env.NODE_ENV);
     /* get auth code */
     const auth_url =
       process.env.NODE_ENV == "production"
-        ? window.location.origin
+        ? window.location.origin + "/auth/code"
         : process.env.REACT_APP_LOCAL_BACKEND_URL + "/auth/code";
 
+    console.log(auth_url);
     window.location.href = auth_url;
   };
 
