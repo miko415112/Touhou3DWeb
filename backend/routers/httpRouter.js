@@ -16,6 +16,7 @@ const createClient = (req, res, next) => {
   try {
     let redirect_url = req.get("Referrer");
     redirect_url = new URL(redirect_url);
+    redirect_url.search = "";
     redirect_url.pathname = "/login";
 
     console.log("redirect_url : " + redirect_url.href);
