@@ -18,6 +18,7 @@ const createClient = (req, res, next) => {
     redirect_url = new URL(redirect_url);
     redirect_url.pathname = "/login";
 
+    console.log("redirect_url : " + redirect_url.href);
     const client = new OAuth2Client(
       process.env.CLIENT_ID,
       process.env.CLIENT_SECRET,

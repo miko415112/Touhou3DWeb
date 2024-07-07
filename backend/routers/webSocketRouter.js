@@ -351,12 +351,12 @@ const handleBroadcast = (io) => {
 };
 
 const handleConsoleLog = (io) => {
-  setInterval(() => {
-    console.log("=============== rooms ===============");
-    console.log(rooms);
-    console.log("=============== onlinePlayers ===============");
-    console.log(onlinePlayers);
-    console.log("=============== connections ===============");
-    console.log("connection : ", info.connections);
-  }, 1500);
+  // setInterval(() => {
+  //   console.log("=============== rooms ===============");
+  //   console.log(rooms);
+  //   console.log("=============== onlinePlayers ===============");
+  //   console.log(onlinePlayers);
+  //   console.log("=============== connections ===============");
+  //   console.log("connection : ", info.connections);
+  // }, 1500);
 };
