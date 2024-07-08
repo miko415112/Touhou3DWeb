@@ -1,3 +1,7 @@
+[Demo Video]
+
+- https://youtu.be/T7FkZ63oBXs
+
 [Deploy Website]
 
 - https://touhou3dweb-production.up.railway.app
