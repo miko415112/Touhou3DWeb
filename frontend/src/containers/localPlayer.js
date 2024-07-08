@@ -30,7 +30,7 @@ export const LocalPlayer = () => {
   const { camera } = useThree();
   const { cameraPos, cameraEuler, modelPos, modelEuler, fireState } =
     useControl(spawnPos, spawnEuler, posConstrains);
-  const [healthPoints, setHealthPoints] = useState(20);
+  const [healthPoints, setHealthPoints] = useState(10);
   const preUpdateTime = useRef(0);
   const immune = useRef(false);
 
